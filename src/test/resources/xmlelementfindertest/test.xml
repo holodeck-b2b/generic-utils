@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ElementFinderTestDocument xmlns="http://holodeck-b2b.org/schemas/2020/12/xmlelementfindertest" xmlns:a="http://holodeck-b2b.org/schemas/2020/12/xmlelementfindertest/a"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <ChildLevelOne>
+        <a:ChildLevelTwo>
+            <a:ChildLevelThree>Hello World!</a:ChildLevelThree>
+        </a:ChildLevelTwo>
+    </ChildLevelOne>
+    <SecondLevelOne xmlns="http://holodeck-b2b.org/schemas/2020/12/xmlelementfindertest/b">
+        <ChildLevelTwo>Hello World!</ChildLevelTwo>            
+    </SecondLevelOne>
+</ElementFinderTestDocument>

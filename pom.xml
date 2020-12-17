@@ -1,0 +1,122 @@
+<!-- Copyright (C) 2020 The Holodeck B2B Team, Sander Fieten This program 
+	is free software: you can redistribute it and/or modify it under the terms 
+	of the GNU General Public License as published by the Free Software Foundation, 
+	either version 3 of the License, or (at your option) any later version. This 
+	program is distributed in the hope that it will be useful, but WITHOUT ANY 
+	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+	FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more 
+	details. You should have received a copy of the GNU Lesser General Public 
+	License along with this program. If not, see <http://www.gnu.org/licenses/>. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.holodeckb2b.commons</groupId>
+	<artifactId>generic-utils</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+	<name>Holodeck B2B - Generic Utilities</name>
+	<description>This project contains a collection of classes that provide generic utilities commonly used in
+	other Holodeck B2B projects</description>
+	<inceptionYear>2020</inceptionYear>
+
+	<scm>
+		<url>https://github.com/holodeck-b2b/generic-utils</url>
+		<connection>scm:git:https://github.com/holodeck-b2b/generic-utils.git</connection>
+		<developerConnection>scm:git:git@github.com:holodeck-b2b/generic-utils.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/holodeck-b2b/generic-utils/issues</url>
+	</issueManagement>
+
+	<organization>
+		<name>The Holodeck B2B Team</name>
+		<url>http://www.holodeck-b2b.org/team</url>
+	</organization>
+	<developers>
+		<developer>
+			<name>Sander Fieten</name>
+			<organization>Chasquis</organization>
+			<organizationUrl>http://chasquis-consulting.com/holodeck-b2b-support/</organizationUrl>
+			<email>sander at chasquis-consulting.com</email>			
+			<roles>
+				<role>Architect</role>
+				<role>Lead developer</role>
+			</roles>
+			<timezone>Europe/Amsterdam</timezone>
+		</developer>
+		<developer>
+			<name>Renate Slebe</name>
+			<organization>Chasquis</organization>
+			<organizationUrl>http://chasquis-consulting.com/holodeck-b2b-support/</organizationUrl>
+			<email>renate at chasquis-consulting.com</email>
+			<roles>
+				<role>Product manager</role>
+				<role>QA and documentation</role>
+			</roles>
+			<timezone>Europe/Amsterdam</timezone>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License v3</name>
+			<url>https://www.gnu.org/licenses/lgpl-3.0-standalone.html</url>
+		</license>
+	</licenses>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<holodeckb2b-version>5.0.3</holodeckb2b-version>
+		<!-- <axis2-version>1.7.7</axis2-version> <axiom-version>1.2.20</axiom-version> 
+			<log4j.version>2.6.2</log4j.version> -->
+	</properties>
+
+	<dependencies>
+		<!-- Apache Tika is used to determine MIME Type -->
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>1.25</version>
+        </dependency>
+        <!--  BouncyCastle is used for certificate processing -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.61</version>
+        </dependency>
+		<!-- Dependencies specific for testing -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.4.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- Create a test-jar so the test utility classes can be included in 
+				other projects -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+						<configuration>
+							<includes>
+								<include>**/commons/testing/*</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
