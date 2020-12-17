@@ -53,7 +53,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class UtilsTest {
 
 	@Test
-	public void testGetKeyByValue() {
+	void testGetKeyByValue() {
 		HashMap<String, String> map = new HashMap<>();
 		map.put("key1", "value1");
 		map.put("key2", "value2");
@@ -66,7 +66,7 @@ public class UtilsTest {
 	}
 
 	@Test
-	public void date2XMLString() {
+	void date2XMLString() {
 		Calendar ts = Calendar.getInstance();
 		ts.set(2020, 2, 2, 9, 0, 0);
 		String xmlNow = Utils.toXMLDateTime(Date.from(ts.toInstant()));
@@ -86,7 +86,7 @@ public class UtilsTest {
 	}
 
 	@Test
-	public void localDateTime2XMLString() {
+	void localDateTime2XMLString() {
 		LocalDateTime ts = LocalDateTime.of(2020, 2, 2, 9, 0, 0, 0);
 		String xmlNow = Utils.toXMLDateTime(ts);
 
@@ -108,7 +108,7 @@ public class UtilsTest {
 	@ValueSource(strings = { "2020-05-04T19:13:51.0", "2020-05-04T17:13:51Z", "2020-05-04T15:13:51-02:00",
 			"2020-05-04T19:13:51", "2020-05-04T19:13:51.000+02:00", "2020-05-04T19:13:51.00050",
 			"2020-05-04T18:13:51+01:00", "2020-05-04T17:13:51+00:00" })
-	public void testFromXMLDateTime(String xmlTimestamp) {
+	void testFromXMLDateTime(String xmlTimestamp) {
 		TimeZone defaultZone = TimeZone.getDefault();
 		TimeZone.setDefault(TimeZone.getTimeZone("CET"));
 		Calendar ts = Calendar.getInstance();
@@ -131,7 +131,33 @@ public class UtilsTest {
 	}
 
 	@Test
-	public void testParseDateTimeFromXML() {
+	void testParseEmptyDate() {
+		try {
+			assertNull(Utils.fromXMLDateTime(""));
+		} catch (ParseException e) {
+			fail();
+		}
+		try {
+			assertNull(Utils.fromXMLDateTime(null));
+		} catch (ParseException e) {
+			fail();
+		}
+		
+		try {
+			assertNull(Utils.parseDateTimeFromXML(""));
+		} catch (ParseException e) {
+			fail();
+		}
+		try {
+			assertNull(Utils.parseDateTimeFromXML(null));
+		} catch (ParseException e) {
+			fail();
+		}
+		
+	}
+	
+	@Test
+	void testParseDateTimeFromXML() {
 		ZonedDateTime ts = null;
 		try {
 			ts = Utils.parseDateTimeFromXML("2020-05-04T19:13:51.0");
@@ -186,7 +212,7 @@ public class UtilsTest {
 	 * compareStrings}
 	 */
 	@Test
-	public void testCompareStrings() {
+	void testCompareStrings() {
 		assertTrue(Utils.compareStrings("a", "b") == -2);
 
 		assertTrue(Utils.compareStrings(null, null) == -1);
@@ -204,7 +230,7 @@ public class UtilsTest {
 	}
 
 	@Test
-	public void testGetValueOrDefault() {
+	void testGetValueOrDefault() {
 		assertEquals("default", Utils.getValueOrDefault(null, "default"));
 		assertEquals("default", Utils.getValueOrDefault("", "default"));
 		assertEquals("data", Utils.getValueOrDefault("data", "default"));
@@ -212,18 +238,18 @@ public class UtilsTest {
 	
 	@ParameterizedTest
 	@ValueSource(strings = { "T", "true", "True", "tRuE", "y", "Y", "1", "yes" , "yEs" })
-	public void testIsTrueCorrect(String v) {
+	void testIsTrueCorrect(String v) {
 		assertTrue(Utils.isTrue(v));
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = { "F", "false", "False", "tREu", "0", "11", "eys", "TT" })
-	public void testIsTrueInCorrect(String v) {
+	void testIsTrueInCorrect(String v) {
 		assertFalse(Utils.isTrue(v));
 	}
 	
 	@Test
-	public void testCopyStream() throws IOException {
+	void testCopyStream() throws IOException {
 		byte[] source = "This string will be used as the source stream for testing the copy stream method".getBytes();
 		
 		ByteArrayInputStream bis = new ByteArrayInputStream(source);

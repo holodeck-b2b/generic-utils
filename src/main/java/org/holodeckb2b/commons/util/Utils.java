@@ -86,12 +86,15 @@ public final class Utils {
      * be in the system's default time zone. 
      *
      * @param   xmlDateTimeString   string that should contain the <code>xs:dateTime</code> formatted date
-     * @return  A {@link Date} object for the parsed date
+     * @return  A {@link Date} object for the parsed date or,</br>
+     * 			<code>null</code> when the input is empty or <code>null</code>
      * @throws  ParseException on date time parsing error
      */    
     public static ZonedDateTime parseDateTimeFromXML(final String xmlDateTimeString) throws ParseException {
     	final String[] formatAndC14NValue = getFormatAndC14N(xmlDateTimeString);
-    	if (formatAndC14NValue[0].endsWith("Z"))
+    	if (formatAndC14NValue == null)
+    		return null;
+    	else if (formatAndC14NValue[0].endsWith("Z"))
     		return ZonedDateTime.parse(formatAndC14NValue[1], DateTimeFormatter.ofPattern(formatAndC14NValue[0]));
     	else 
     		return ZonedDateTime.of(LocalDateTime.parse(formatAndC14NValue[1], 
@@ -105,12 +108,14 @@ public final class Utils {
      * time stamp in the default time zone.
      *
      * @param   xmlDateTimeString   string that should contain the <code>xs:dateTime</code> formatted date
-     * @return  A {@link Date} object for the parsed date
+     * @return  A {@link Date} object for the parsed date or,</br>
+     * 			<code>null</code> when the input is empty or <code>null</code>
      * @throws  ParseException on date time parsing error
      */
     public static Date fromXMLDateTime(final String xmlDateTimeString) throws ParseException {
-    	final String[] formatAndC14NValue = getFormatAndC14N(xmlDateTimeString);
-    	return new SimpleDateFormat(formatAndC14NValue[0]).parse(formatAndC14NValue[1]);
+    	final String[] formatAndC14NValue = getFormatAndC14N(xmlDateTimeString);    	
+    	return formatAndC14NValue != null ? new SimpleDateFormat(formatAndC14NValue[0]).parse(formatAndC14NValue[1])
+    									  : null;
     }
     
     /**
@@ -122,6 +127,9 @@ public final class Utils {
      * 			XML date time 
      */
     private static String[] getFormatAndC14N(final String xmlDateTimeString) {
+    	if (Utils.isNullOrEmpty(xmlDateTimeString))
+    		return null;
+    	
     	String s = xmlDateTimeString;
         String f = null;
 
