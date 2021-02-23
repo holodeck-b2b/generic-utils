@@ -324,23 +324,47 @@ public final class Utils {
      *      ...
      * </pre>
      *
-     * @param t The exception that occurred
+     * @param t 		The exception that occurred
      * @return  The list of exceptions that caused this exception including their error message
      */
     public static String getExceptionTrace(final Throwable t) {
-        final StringBuffer r = new StringBuffer();
+    	return getExceptionTrace(t, false);
+    }
 
+    /**
+     * Creates a string for inclusion in logs containing the list of exceptions including their exception messages that
+     * caused the given exception.
+     * <p>The format of the generated string is with the exception message only included if one is provided by the
+     * exception:
+     * <pre>
+     * «Exception class name» : «exception message»
+     *      Caused by: «Exception class name» : «exception message»
+     *      Caused by: «Exception class name» : «exception message»
+     *      ...
+     * </pre>
+     * Optionally an additional tab character can be added to all lines so the exception trace is better alligned.
+     *
+     * @param t 		The exception that occurred
+     * @param indent	Indicates whether an additional tab character should be added
+     * @return  The list of exceptions that caused this exception including their error message
+     */
+    public static String getExceptionTrace(final Throwable t, final boolean indent) {
+        final StringBuffer r = new StringBuffer();
+        
+        if (indent)
+        	r.append('\t');
         r.append(t.getClass().getSimpleName());
         if (!isNullOrEmpty(t.getMessage()))
             r.append(" : ").append(t.getMessage());
         Throwable cause = t.getCause();
-        if (cause != null) {
-            do {
-                r.append('\n').append('\t').append("Caused by: ").append(cause.getClass().getSimpleName());
-                if (!isNullOrEmpty(cause.getMessage()))
-                    r.append(" : ").append(cause.getMessage());
-                cause = cause.getCause();
-            } while (cause != null);
+    	while (cause != null) {
+            r.append('\n').append('\t');
+            if (indent)
+            	r.append('\t');
+            r.append("Caused by: ").append(cause.getClass().getSimpleName());
+            if (!isNullOrEmpty(cause.getMessage()))
+                r.append(" : ").append(cause.getMessage());
+            cause = cause.getCause();
         }
 
         return r.toString();
