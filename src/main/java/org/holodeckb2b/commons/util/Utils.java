@@ -435,18 +435,25 @@ public final class Utils {
     }    
     
     /**
-     * Copies the content of an input stream to an output stream. Note that this method will copy all content 
-     * <b>remaining</b> on the source stream and <b>add</b> it to the what is already written to the destination stream.
-     * Neither the input nor the output stream will be close by this method. 
+     * Copies the content of an input stream to an output stream and returns the numbers of bytes copied. 
+     * <p>Note that this method will copy all content <b>remaining</b> on the source stream and <b>append</b> it to the 
+     * what is already written to the destination stream. Neither the input nor the output stream will be close by this 
+     * method. 
      *   
      * @param src	source stream
      * @param dst	destination stream
+     * @return	the number of bytes copied from the source to the destination stream
      * @throws IOException	when an error occurs reading from the source or writing to the destination stream 
      */
-    public static void copyStream(InputStream src, OutputStream dst) throws IOException {
+    public static long copyStream(InputStream src, OutputStream dst) throws IOException {
+    	long copied = 0;
     	int b;
-    	while ((b = src.read()) > 0)
-    		dst.write(b);
+    	while ((b = src.read()) > 0) {
+    		dst.write(b); 
+    		copied++;
+    	}
     	dst.flush();
+    	
+    	return copied;
     }
 }
