@@ -16,6 +16,8 @@
  ******************************************************************************/
 package org.holodeckb2b.commons.util;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,8 +25,11 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +40,7 @@ import org.junit.jupiter.api.Test;
 public class FileUtilsTest {
 
 	@Test
-	public void testIsWriteableDir() {
+	void testIsWriteableDir() {
 		Path testDir = TestUtils.getTestResource("directory");			
 		try {
 			Files.createDirectory(testDir);
@@ -70,7 +75,7 @@ public class FileUtilsTest {
 	
 	
 	@Test
-	public void testPreventDuplicateFileName() {
+	void testPreventDuplicateFileName() {
 	    Path baseDir = TestUtils.getTestClassBasePath();
 	            
 	    try {
@@ -99,5 +104,69 @@ public class FileUtilsTest {
 	        fail();
 	    }
 	}
+	
+	@Test
+	void testRemoveDirectory() {
+		Path dirToDelete = TestUtils.getTestClassBasePath().resolve("dirtodelete");
+		Path dirContent = TestUtils.getTestResource("dirtodelete_content");
+		try {
+			Files.walkFileTree(dirContent, 	new SimpleFileVisitor<Path>() {
+				public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attr) throws IOException {
+					Files.copy(p, dirToDelete.resolve(dirContent.relativize(p)));
+					return FileVisitResult.CONTINUE;
+				}
+			
+				public FileVisitResult visitFile(Path p, BasicFileAttributes attr) throws IOException {
+					Files.copy(p, dirToDelete.resolve(dirContent.relativize(p)));						
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			fail(e);
+		}	
+		
+		assertDoesNotThrow(() -> FileUtils.removeDirectory(dirToDelete));		
+		assertFalse(Files.exists(dirToDelete));
+		
+		Path fileNotToBeDeleted = TestUtils.getTestResource("dirtodelete_content/HelloWorld.txt");
+		assertTrue(Files.exists(fileNotToBeDeleted));
+		assertDoesNotThrow(() -> FileUtils.removeDirectory(fileNotToBeDeleted));
+		assertTrue(Files.exists(fileNotToBeDeleted));	
+		
+		Path alreadyGone = TestUtils.getTestClassBasePath().resolve("alreadyGone");
+		assertFalse(Files.exists(alreadyGone));
+		
+		assertDoesNotThrow(() -> FileUtils.removeDirectory(alreadyGone));
+	}	
+
+	@Test
+	void testCleanDirectory() {
+		Path dirToClean = TestUtils.getTestClassBasePath().resolve("dirtoclean");
+		Path dirContent = TestUtils.getTestResource("dirtodelete_content");
+		try {
+			Files.walkFileTree(dirContent, 	new SimpleFileVisitor<Path>() {
+				public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attr) throws IOException {
+					Files.copy(p, dirToClean.resolve(dirContent.relativize(p)));
+					return FileVisitResult.CONTINUE;
+				}
+				
+				public FileVisitResult visitFile(Path p, BasicFileAttributes attr) throws IOException {
+					Files.copy(p, dirToClean.resolve(dirContent.relativize(p)));						
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			fail(e);
+		}	
+		
+		assertDoesNotThrow(() -> FileUtils.cleanDirectory(dirToClean));		
+		assertTrue(Files.exists(dirToClean));
+		
+		try {
+			assertEquals(0, Files.list(dirToClean).count());
+		} catch (IOException e) {
+			fail(e);			
+		}
+	}	
 
 }
