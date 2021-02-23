@@ -249,19 +249,35 @@ public class UtilsTest {
 	}
 	
 	@Test
+	void testParseIntArray() {
+		assertNull(Utils.parseIntArray(null));
+		assertNull(Utils.parseIntArray(""));
+		
+		assertArrayEquals(new int[] { 1 }, Utils.parseIntArray("1"));
+		assertArrayEquals(new int[] { 1, 2, 3, 4 }, Utils.parseIntArray(" 1 ,2,3 ,4 "));
+		assertArrayEquals(new int[] { 1, 2, -3, 4 }, Utils.parseIntArray(" 1 ,2,-3 ,4 "));
+
+		assertNull(Utils.parseIntArray("A"));
+		assertNull(Utils.parseIntArray("1, A, 2"));
+		assertNull(Utils.parseIntArray("1, 2,A"));
+	}
+	
+	@Test
 	void testCopyStream() throws IOException {
 		byte[] source = "This string will be used as the source stream for testing the copy stream method".getBytes();
 		
 		ByteArrayInputStream bis = new ByteArrayInputStream(source);
 		CloseableByteArrayOutputStream bos = new CloseableByteArrayOutputStream();
 		
+		long copyCount = 0;
 		try {
-			Utils.copyStream(bis, bos);
+			copyCount = Utils.copyStream(bis, bos);
 		} catch (Throwable t) {
 			fail(t);		
 		}
 		
 		assertEquals(0, bis.available());		
+		assertEquals(source.length, copyCount);
 		assertArrayEquals(source, bos.toByteArray());
 		assertFalse(bos.isClosed);
 		
