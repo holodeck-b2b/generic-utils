@@ -237,6 +237,29 @@ public final class Utils {
     }
 
     /**
+     * Parses a string containing a comma-separated list of integers to an array of integers.
+     *
+     * @param csText  	Text containing the comma separated list
+     * @return  		An array containing the integers from the list, or<br>
+     *          		<code>null</code> if the string could not be parsed
+     */
+    public static int[] parseIntArray(final String csText) {
+        if (Utils.isNullOrEmpty(csText))
+            return null;
+
+        try {
+            final String[] sIntervals = csText.split(",");
+            final int[] intervals = new int[sIntervals.length];
+            for(int i = 0; i < sIntervals.length ; i++)
+                intervals[i] = Integer.parseInt(sIntervals[i].trim());
+            return intervals;
+        } catch (NumberFormatException nan) {
+            // The given text does not contain a comma-separated list of integers
+            return null;
+        }
+    }     
+    
+    /**
      * Checks whether the given String is <code>null</code> or is an empty string, i.e. does not contain any other
      * characters then whitespace.
      *
