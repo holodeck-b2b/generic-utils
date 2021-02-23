@@ -17,6 +17,7 @@
 package org.holodeckb2b.commons.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -46,7 +47,37 @@ public final class FileUtils {
 
 	/**
 	 * Determines the mime type of the given file. It can not be guaranteed that this method will return the correct
-	 * mime type. Therefor it is RECOMMENDED that the producer of the file supplies the [correct] mime type together
+	 * mime type. Therefore it is RECOMMENDED that the producer of the file supplies the [correct] mime type together
+	 * with it.
+	 * <p>
+	 * Current implementation is based on <i>Apache Tika</i> which scans file contents to detect mime type.
+	 *
+	 * @param f Path of the file to determine the mime type for
+	 * @return The detected mime type for the given file
+	 * @throws IOException When the given file can not be accessed for mime type detection
+	 */
+	public static String detectMimeType(final String f) throws IOException {
+		return detectMimeType(new File(f));
+	}
+	
+	/**
+	 * Determines the mime type of the given file. It can not be guaranteed that this method will return the correct
+	 * mime type. Therefore it is RECOMMENDED that the producer of the file supplies the [correct] mime type together
+	 * with it.
+	 * <p>
+	 * Current implementation is based on <i>Apache Tika</i> which scans file contents to detect mime type.
+	 *
+	 * @param f Path of the file to determine the mime type for
+	 * @return The detected mime type for the given file
+	 * @throws IOException When the given file can not be accessed for mime type detection
+	 */
+	public static String detectMimeType(final Path f) throws IOException {
+		return detectMimeType(f.toFile());
+	}
+	
+	/**
+	 * Determines the mime type of the given file. It can not be guaranteed that this method will return the correct
+	 * mime type. Therefore it is RECOMMENDED that the producer of the file supplies the [correct] mime type together
 	 * with it.
 	 * <p>
 	 * Current implementation is based on <i>Apache Tika</i> which scans file contents to detect mime type.
@@ -169,7 +200,51 @@ public final class FileUtils {
 	public static boolean isWriteableDirectory(final Path p) {
 		return p != null && Files.isDirectory(p) && Files.isWritable(p);
 	}
-
+	
+	/**
+	 * Removes a directory and all its content. 
+	 * This method will complete when the directory specified by the given path does not exist anymore.
+	 * 
+	 * @param dir	path of the directory to remove, must not be <code>null</code>
+	 * @throws IOException	if the directory and its content could not be removed completely. NOTE: When this exception 
+	 * 						is thrown the directory itself is not removed, but its content may be (partially) removed.  
+	 */
+	public static void removeDirectory(Path dir)  throws IOException {
+		if (dir == null)
+			throw new IllegalArgumentException("Path to directory not specified");
+		
+		if (!Files.exists(dir) || !Files.isDirectory(dir))
+			return;
+					
+		cleanDirectory(dir);
+		
+		if (!Files.deleteIfExists(dir))
+			throw new IOException("Could not remove directory " + dir.toString());
+	}
+	
+	/**
+	 * Removes all content from a directory, this will both remove files and sub-directories. 
+	 * 
+	 * @param dir	path of the directory to clean, must not be <code>null</code>
+	 * @throws FileNotFoundException if the specified directory does not exist
+	 * @throws IOException	if some of the content could not be removed completely. NOTE: When this exception 
+	 * 						is thrown the content may be already been partially removed.  
+	 */
+	public static void cleanDirectory(Path dir)  throws IOException {
+		if (dir == null)
+			throw new IllegalArgumentException("Path to directory not specified");
+		
+		if (!Files.exists(dir) || !Files.isDirectory(dir))
+			throw new FileNotFoundException(dir.toString());
+					
+		for(File f : dir.toFile().listFiles()) {
+			if (f.isDirectory())
+				removeDirectory(f.toPath());
+			else if (!f.delete())
+				throw new IOException("Could not remove file " + f.toString());
+		}	
+	}
+	
 	/**
 	 * Sorts an array of files so that the filenames are in alphabetical order. The sort operational is done in the
 	 * array itself so there is no return value.
