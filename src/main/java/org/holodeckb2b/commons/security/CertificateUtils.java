@@ -112,13 +112,16 @@ public class CertificateUtils {
      * Gets the CN field of the provided X509 certificate's Subject DN.
      * 
      * @param cert	The X509 certificate
-     * @return	The CN field of the Subject's DN 
-     * @throws CertificateException When the certificate could not be read
+     * @return	The CN field of the Subject's DN or <code>null</code> if the CN could not be read
      */
     public static String getSubjectCN(final X509Certificate cert) {
-		X500Name x500name = new X500Name(cert.getSubjectX500Principal().getName());
-		RDN cn = x500name.getRDNs(BCStyle.CN)[0];
-		return IETFUtils.valueToString(cn.getFirst().getValue());
+    	try {
+			X500Name x500name = new X500Name(cert.getSubjectX500Principal().getName());
+			RDN cn = x500name.getRDNs(BCStyle.CN)[0];
+			return IETFUtils.valueToString(cn.getFirst().getValue());
+		} catch (Exception invalidCert) {
+			return null;
+		}    
     }
 
     /**
