@@ -116,7 +116,6 @@ public final class KeystoreUtils {
 	 *
 	 * @param path Path to the keystore
 	 * @param pwd  Password to access the keystore
-	 * @throws SecurityProcessingException When the keystore could not be accessed.
 	 */
 	public static boolean check(final Path path, final String pwd) {
 		if (!Files.isRegularFile(path) || !Files.isReadable(path))
@@ -136,7 +135,6 @@ public final class KeystoreUtils {
 	 * @param path Path to the keystore
 	 * @param pwd  Password to access the keystore
 	 * @param type The expected type of the keustore, either JKS or PKCS#12 
-	 * @throws SecurityProcessingException When the keystore could not be accessed.
 	 */
 	public static boolean check(final Path path, final String pwd, final KeystoreType type) {
 		if (!Files.isRegularFile(path) || !Files.isReadable(path))

@@ -28,8 +28,6 @@ import org.junit.jupiter.api.Test;
 
 class KeystoreUtilsTest {
 	
-	private PrivateKeyEntry readKeyPairFromPKCS12;
-
 	@BeforeAll
 	static void setBCAsPrfdProvider() {
 		Security.insertProviderAt(new BouncyCastleProvider(), 1);		

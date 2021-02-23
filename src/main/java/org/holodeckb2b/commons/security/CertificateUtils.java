@@ -129,8 +129,7 @@ public class CertificateUtils {
      * <p>NOTE: This is a different serial number then the serial number of the certificate itself! 
      * 
      * @param cert	The X509 certificate
-     * @return	The Subject's Serial Number field 
-     * @throws CertificateException When the certificate could not be read
+     * @return	The Subject's Serial Number field or <code>null</code> if the SN could not be read
      */
     public static String getSubjectSN(final X509Certificate cert)  {
     	try {
