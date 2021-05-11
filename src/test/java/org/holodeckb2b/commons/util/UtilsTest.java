@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -41,6 +42,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.holodeckb2b.commons.util.spi_test.FirstAvailableProvider;
+import org.holodeckb2b.commons.util.spi_test.IProviderInterface;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -283,6 +286,20 @@ public class UtilsTest {
 		
 		assertDoesNotThrow(() -> bis.close());
 		assertDoesNotThrow(() -> bos.close());
+	}
+	
+	@Test
+	void testGetFirstAvailableProvider() {
+		
+		IProviderInterface provider = null;		
+		try {
+			provider = Utils.getFirstAvailableProvider(IProviderInterface.class); 
+		} catch (Throwable t) {
+			fail(t);
+		}
+		
+		assertNotNull(provider);
+		assertTrue(provider instanceof FirstAvailableProvider);
 	}
 	
 	class CloseableByteArrayOutputStream extends ByteArrayOutputStream {

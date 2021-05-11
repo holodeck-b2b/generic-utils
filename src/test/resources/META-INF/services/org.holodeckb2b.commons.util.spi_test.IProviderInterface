@@ -1,0 +1,4 @@
+org.holodeckb2b.commons.util.spi_test.FaultyProvider
+org.holodeckb2b.commons.util.spi_test.NonExistingProvider
+org.holodeckb2b.commons.util.spi_test.FirstAvailableProvider
+org.holodeckb2b.commons.util.spi_test.NeverLoadedProvider

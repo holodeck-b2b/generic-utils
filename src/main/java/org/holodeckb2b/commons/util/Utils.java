@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ServiceLoader;
 import java.util.TimeZone;
 
 /**
@@ -478,5 +479,26 @@ public final class Utils {
     	dst.flush();
     	
     	return copied;
+    }
+    
+    /**
+     * Gets the first available provider that implements the given interface. This method uses the Java Service Provider
+     * Interface to get the list of providers and returns the first one that can be successfully instantiated. 
+     * 
+     * @param <T>	the interface that specifies the provider to be loaded
+     * @param providerClass	the provider interface class
+     * @return an instance of the first provider that is available, <code>null</code> if no provider is available
+     */
+    public static <T> T getFirstAvailableProvider(Class<T> providerClass) {
+    	T	provider = null;
+    	Iterator<T> providers = ServiceLoader.load(providerClass).iterator();
+    	
+    	while (provider == null && providers.hasNext()) {
+            try {
+                provider = providers.next();
+            } catch (Throwable t) {                                
+            }
+        }    	
+    	return provider;
     }
 }
