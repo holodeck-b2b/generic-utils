@@ -471,7 +471,7 @@ public final class Utils {
     public static long copyStream(InputStream src, OutputStream dst) throws IOException {
     	long copied = 0;
     	int b;
-    	while ((b = src.read()) > 0) {
+    	while ((b = src.read()) >= 0) {
     		dst.write(b); 
     		copied++;
     	}
