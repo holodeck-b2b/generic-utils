@@ -43,7 +43,7 @@ public final class KeystoreUtils {
 	 * Enumerates the supported keystore types
 	 */
 	public enum KeystoreType {
-		JKS, PKCS12
+		JKS, JCEKS, PKCS12
 	}
 
 	/**
@@ -153,10 +153,12 @@ public final class KeystoreUtils {
 	}
 
 	private static final byte[] JKS_MAGIC_NO = new byte[] { (byte) 0xFE, (byte) 0xED, (byte) 0xFE, (byte) 0xED };
+	private static final byte[] JCEKS_MAGIC_NO = new byte[] { (byte) 0xCE, (byte) 0xCE, (byte) 0xCE, (byte) 0xCE };
 
 	/**
-	 * Detects whether the keystore is in JKS or PKCS#12 format. This is checked by reading the first four bytes of the
-	 * file and comparing this to the magic number that is at the start of JKS files (0xFEEDFEED).
+	 * Detects whether the keystore is in JKS, JCEKS or PKCS#12 format. This is checked by reading the first four bytes 
+	 * of the file and comparing this to the magic number that is at the start of JKS or JCEKS files (0xFEEDFEED resp.
+	 * 0xCECECECE).
 	 * 
 	 * @param ksPath path to the keystore
 	 * @return the detected type
@@ -167,12 +169,13 @@ public final class KeystoreUtils {
 			byte[] magicno = new byte[4];
 			fis.read(magicno);
 
-			return Arrays.equals(JKS_MAGIC_NO, magicno) ? KeystoreType.JKS : KeystoreType.PKCS12;
+			return Arrays.equals(JKS_MAGIC_NO, magicno) ? KeystoreType.JKS :
+						Arrays.equals(JCEKS_MAGIC_NO, magicno) ? KeystoreType.JCEKS : KeystoreType.PKCS12;
 		}
 	}
 
 	/**
-	 * Loads the specified JKS or PKCS#12 keystore from disk.  
+	 * Loads the specified JKS, JCEKS or PKCS#12 keystore from disk.  
 	 * 
 	 * @param path 		Path to the keystore
 	 * @param password  Password to access the keystore

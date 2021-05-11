@@ -107,6 +107,19 @@ class KeystoreUtilsTest {
 		} catch (Throwable t) {
 			fail(t);
 		}
+		
+		try {
+			assertTrue(KeystoreUtils.check(TestUtils.getTestResource("sharedkey.jceks"), "sharedkey", 
+											KeystoreType.JCEKS));
+		} catch (Throwable t) {
+			fail(t);
+		}
+		try {
+			assertFalse(KeystoreUtils.check(TestUtils.getTestResource("sharedkey.jceks"), "sharedkey", 
+											KeystoreType.JKS));
+		} catch (Throwable t) {
+			fail(t);
+		}
 	}
 	
 	@Test
@@ -284,4 +297,28 @@ class KeystoreUtilsTest {
 			}
 		}		
 	}
+	
+	@Test
+	void testLoadJCEKS() {
+		KeyStore ks = null;
+		
+		try {
+			ks = KeystoreUtils.load(TestUtils.getTestResource("sharedkey.jceks"), "sharedkey");
+		} catch (Throwable t) {
+			fail(t);
+		}
+		assertNotNull(ks);
+		int n = 0, pk = 0;
+		try {
+			for(Enumeration<String> aliases = ks.aliases(); aliases.hasMoreElements();) {
+				String a = aliases.nextElement(); n++;
+				if (ks.isKeyEntry(a))
+					pk++;
+			}
+		} catch (KeyStoreException kse) {
+			fail(kse);
+		}
+		assertEquals(1, n);
+		assertEquals(1, pk);
+	}	
 }
