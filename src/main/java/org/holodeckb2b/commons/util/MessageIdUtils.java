@@ -88,6 +88,17 @@ public class MessageIdUtils {
     }
     
     /**
+     * Ensures that the given message id does not contain non valid characters as defined by the format as specified in 
+     * RFC2822 by replacing all non valid characters with '_'.
+     * 
+     * @param msgId		the message id to make compliant
+     * @return			the message id without any invalid characters
+     */
+    public static String sanitizeId(final String msgId) {
+    	return msgId == null ? null : msgId.replaceAll("[^" + VALID_CHARS + "]", "_");
+    }
+    
+    /**
      * Contains the regular expression to use for checking on conformance to RFC2822. The regular expression is based
      * on the ABNF definition of messageId given in the RFC.
      */

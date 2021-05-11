@@ -19,6 +19,7 @@ package org.holodeckb2b.commons.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -87,6 +88,18 @@ public class MessageIdUtilsTest {
     	assertFalse(MessageIdUtils.isAllowed(""));
     	assertFalse(MessageIdUtils.isAllowed("just a test@holodeck-b2b.org"));    	
     	assertFalse(MessageIdUtils.isAllowed("just[8]test@holodeck-b2b.org"));    	
+    }
+    
+    @Test
+    public void testSanitize() {
+    	assertNull(MessageIdUtils.sanitizeId(null));
+    	assertEquals("", MessageIdUtils.sanitizeId(""));
+    	assertEquals("hello", MessageIdUtils.sanitizeId("hello"));
+    	assertEquals("hello_world", MessageIdUtils.sanitizeId("hello world"));
+    	assertEquals("hello@world", MessageIdUtils.sanitizeId("hello@world"));
+    	assertEquals("hello.world@earth.org", MessageIdUtils.sanitizeId("hello.world@earth.org"));
+    	assertEquals("hello.world@earth@org", MessageIdUtils.sanitizeId("hello.world@earth@org"));
+    	assertEquals("hello.world@earth__org", MessageIdUtils.sanitizeId("hello.world@earth::org"));
     }
     
     
