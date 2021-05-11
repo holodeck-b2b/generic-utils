@@ -68,10 +68,6 @@
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-
-		<holodeckb2b-version>5.0.3</holodeckb2b-version>
-		<!-- <axis2-version>1.7.7</axis2-version> <axiom-version>1.2.20</axiom-version> 
-			<log4j.version>2.6.2</log4j.version> -->
 	</properties>
 
 	<dependencies>
