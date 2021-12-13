@@ -1,5 +1,5 @@
 # Holodeck B2B Generic Utilities
-This project contains a collection of classes that provide generic utilities commonly used in other [Holodeck B2B](https://github.com/holodeck-b2b/) projects
+This project contains a collection of classes that provide generic utilities commonly used in other [Holodeck B2B](https://github.com/holodeck-b2b/) projects.
 
 
 ## Contributing
@@ -16,7 +16,7 @@ We are using the simplified Github workflow to accept modifications which means 
 If your contribution is more than a patch, please contact us beforehand to discuss which branch you can best submit the pull request to.
 
 ### Submitting bugs
-You can report issues directly on the [project Issue Tracker](https://github.com/holodeck-b2b/commons/issues).
+You can report issues directly on the [project Issue Tracker](https://github.com/holodeck-b2b/generic-utils/issues).
 Please document the steps to reproduce your problem in as much detail as you can (if needed and possible include screenshots).
 
 ## Versioning
@@ -28,4 +28,4 @@ The Holodeck B2B Generic Utilities code is licensed under the General Lesser Pub
 To implement the cryptographic algorithms Holodeck B2B uses the Bouncy Castle library provided by [The Legion of the Bouncy Castle Inc.](http://www.bouncycastle.org), see the bc_license.txt file.
 
 ## Support
-By Chasquis. Visit [Chasquis-consulting.com](http://chasquis-consulting.com/holodeck-b2b-support/) for more information.
+Provided by Chasquis. Visit [Chasquis-consulting.com](http://chasquis-consulting.com/holodeck-b2b-support/) for more information.
