@@ -1,5 +1,5 @@
 # Holodeck B2B Generic Utilities
-This project contains a collection of classes that provide generic utilities commonly used in other Holodeck B2B projects
+This project contains a collection of classes that provide generic utilities commonly used in other [Holodeck B2B](https://github.com/holodeck-b2b/) projects
 
 
 ## Contributing
@@ -23,7 +23,7 @@ Please document the steps to reproduce your problem in as much detail as you can
 Version numbering follows the [Semantic versioning](http://semver.org/) approach.
 
 ## License
-The Holodeck B2B commons code is licensed under the General Lesser Public License V3 (LGPLv3) which is included in [LICENSE.md](LICENSE.md).
+The Holodeck B2B Generic Utilities code is licensed under the General Lesser Public License V3 (LGPLv3) which is included in [LICENSE.md](LICENSE.md).
 
 To implement the cryptographic algorithms Holodeck B2B uses the Bouncy Castle library provided by [The Legion of the Bouncy Castle Inc.](http://www.bouncycastle.org), see the bc_license.txt file.
 
