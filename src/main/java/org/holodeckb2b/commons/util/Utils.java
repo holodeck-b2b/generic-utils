@@ -414,6 +414,23 @@ public final class Utils {
     }
 
     /**
+     * Compare any 2 {@link ZonedDateTime}s in a <code>null</code> safe manner. If both passed
+     * objects are <code>null</code> they are interpreted as being equal. If only
+     * one object is <code>null</code> they are different. If both objects are
+     * non-<code>null</code> than they are converted to {@link Instant}s on the time line
+     * and compared for equality. 
+     *
+     * @param s1	First date time. May be <code>null</code>.
+     * @param s2	Second date time. May be <code>null</code>.
+     * @return <code>true</code> if both are <code>null</code> or if both represent
+     *         the same instant on the time line
+     * @since 1.1.0
+     */    
+    public static boolean nullSafeEqual(final ZonedDateTime t1, final ZonedDateTime t2) {
+    	return t1 == null ? t2 == null : t1.toInstant().equals(t2.toInstant());
+    }
+    
+    /**
      * Compare any 2 {@link String}s in a <code>null</code> safe manner. If both passed
      * objects are <code>null</code> they are interpreted as being equal. If only
      * one object is <code>null</code> they are different. If both objects are
