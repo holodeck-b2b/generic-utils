@@ -1,97 +1,25 @@
 package org.holodeckb2b.commons.security;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.nio.file.Path;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import org.holodeckb2b.commons.testing.TestUtils;
+import org.holodeckb2b.commons.util.Utils;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.nio.file.Path;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import org.holodeckb2b.commons.testing.TestUtils;
-import org.holodeckb2b.commons.util.Utils;
 import org.junit.jupiter.api.Test;
 
 class CertificateUtilsTest {
 
-	@Test
-	void testGetCertFromFileInvalids() {
-		assertThrows(IllegalArgumentException.class, () -> CertificateUtils.getCertificate((Path) null));
-
-		assertThrows(CertificateException.class, 
-								() -> CertificateUtils.getCertificate(TestUtils.getTestResource("image.png")));
-	}
-	
-	@Test
-	void testGetCertFromFilePEM() {
-		
-		X509Certificate cert = null;
-		try {
-			cert = CertificateUtils.getCertificate(TestUtils.getTestResource("partya.cert"));
-		} catch (Throwable t) {
-			fail(t);
-		}
-		
-		String dn = cert.getSubjectDN().getName();	
-		assertAll("DN check", () -> assertTrue(dn.contains("CN=partya.examples.holodeck-b2b.com")),
-						      () -> assertTrue(dn.contains("OU=Holodeck B2B Support")),
-						      () -> assertTrue(dn.contains("O=Chasquis")),
-						      () -> assertTrue(dn.contains("C=NL")));		
-		assertEquals(0x1005, cert.getSerialNumber().intValue());
-		
-	}
-
-	@Test
-	void testGetCertFromFileDER() {
-		
-		X509Certificate cert = null;
-		try {
-			cert = CertificateUtils.getCertificate(TestUtils.getTestResource("partya.der"));
-		} catch (Throwable t) {
-			fail(t);
-		}
-		
-		assertPartyACert(cert);
-	}
-	
-	@Test
-	void testGetCertFromStringInvalids() {
-		try (FileInputStream fis = new FileInputStream(TestUtils.getTestResource("image.png").toFile());
-			 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-			 Utils.copyStream(fis, bos);
-			 
-			 assertThrows(CertificateException.class, () -> CertificateUtils.getCertificate(bos.toByteArray()));
-		} catch (Throwable t) {
-			fail(t);
-		}
-		
-		assertThrows(CertificateException.class, 
-						() -> CertificateUtils.getCertificate("certainly this is not a valid certificate"));
-		
-		X509Certificate cert = null;
-		try {
-			cert = CertificateUtils.getCertificate("");
-		} catch (Throwable t) {
-			fail(t);			
-		}		
-		assertNull(cert);
-		try {
-			cert = CertificateUtils.getCertificate((String) null);
-		} catch (Throwable t) {
-			fail(t);			
-		}		
-		assertNull(cert);
-	}
-	
-	@Test
-	void testGetCertFromString() {				
-		String mimeB64String 
+	private static final String PATRTYA_MIME64_STRING
 				= "MIIFvjCCA6agAwIBAgICEAUwDQYJKoZIhvcNAQELBQAwZjELMAkGA1UEBhMCTkwx\n"
 				+ "ETAPBgNVBAoMCENoYXNxdWlzMR0wGwYDVQQLDBRIb2xvZGVjayBCMkIgU3VwcG9y\n"
 				+ "dDElMCMGA1UEAwwcY2EuZXhhbXBsZXMuaG9sb2RlY2stYjJiLm9yZzAeFw0yMDA3\n"
@@ -123,47 +51,105 @@ class CertificateUtilsTest {
 				+ "8qZB5T3/GZrFCQjRp8R9QUgczc8IRG8VHWvMxMQpBXoi/B4otPr1GeVOJ3mNo05w\n"
 				+ "smTS+lMXeWUtHerJj7PNf3qNqF7cfxKv4ynAl/qDE9U76keJorX4YXqUcB0+nPov\n"
 				+ "LXcT5cmBULZeMLWJKttYX+VqVEImUsOrUPGCLJZWpYj5kQ==\n";
-		
-		StringBuilder buf = new StringBuilder(); 
-		for (String line : mimeB64String.split("\n"))
+
+	@Test
+	void testGetCertFromFileInvalids() {
+		assertThrows(IllegalArgumentException.class, () -> CertificateUtils.getCertificate((Path) null));
+
+		assertThrows(CertificateException.class,
+								() -> CertificateUtils.getCertificate(TestUtils.getTestResource("image.png")));
+	}
+
+	@Test
+	void testGetCertFromFilePEM() {
+
+		X509Certificate cert = null;
+		try {
+			cert = CertificateUtils.getCertificate(TestUtils.getTestResource("partya.cert"));
+		} catch (Throwable t) {
+			fail(t);
+		}
+
+		String dn = cert.getSubjectDN().getName();
+		assertAll("DN check", () -> assertTrue(dn.contains("CN=partya.examples.holodeck-b2b.com")),
+						      () -> assertTrue(dn.contains("OU=Holodeck B2B Support")),
+						      () -> assertTrue(dn.contains("O=Chasquis")),
+						      () -> assertTrue(dn.contains("C=NL")));
+		assertEquals(0x1005, cert.getSerialNumber().intValue());
+
+	}
+
+	@Test
+	void testGetCertFromFileDER() {
+
+		X509Certificate cert = null;
+		try {
+			cert = CertificateUtils.getCertificate(TestUtils.getTestResource("partya.der"));
+		} catch (Throwable t) {
+			fail(t);
+		}
+
+		assertPartyACert(cert);
+	}
+
+	@Test
+	void testGetCertFromStringInvalids() {
+		try (FileInputStream fis = new FileInputStream(TestUtils.getTestResource("image.png").toFile());
+			 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+			 Utils.copyStream(fis, bos);
+
+			 assertThrows(CertificateException.class, () -> CertificateUtils.getCertificate(bos.toByteArray()));
+		} catch (Throwable t) {
+			fail(t);
+		}
+
+		assertThrows(CertificateException.class,
+						() -> CertificateUtils.getCertificate("certainly this is not a valid certificate"));
+
+		X509Certificate cert = null;
+		try {
+			cert = CertificateUtils.getCertificate("");
+		} catch (Throwable t) {
+			fail(t);
+		}
+		assertNull(cert);
+		try {
+			cert = CertificateUtils.getCertificate((String) null);
+		} catch (Throwable t) {
+			fail(t);
+		}
+		assertNull(cert);
+	}
+
+	@Test
+	void testGetCertFromString() {
+		StringBuilder buf = new StringBuilder();
+		for (String line : PATRTYA_MIME64_STRING.split("\n"))
 			buf.append(line);
 		String longB64String = buf.toString();
-		
-		String pemString = "-----BEGIN CERTIFICATE-----\n" + mimeB64String + "-----END CERTIFICATE-----";
+
+		String pemString = "-----BEGIN CERTIFICATE-----\n" + PATRTYA_MIME64_STRING + "-----END CERTIFICATE-----";
 		String pemWithPrologString = "some-prop-to-ignore: partya\n" + pemString;
-				
-		X509Certificate cert = null;		
-		try {
-			cert = CertificateUtils.getCertificate(mimeB64String);
-		} catch (Throwable t) {
-			fail(t);			
-		}		
-		assertPartyACert(cert);
-		
-		try {
-			cert = CertificateUtils.getCertificate(longB64String);
-		} catch (Throwable t) {
-			fail(t);			
-		}		
-		assertPartyACert(cert);
-		
-		try {
-			cert = CertificateUtils.getCertificate(pemString);
-		} catch (Throwable t) {
-			fail(t);			
-		}		
-		assertPartyACert(cert);		
-		
-		try {
-			cert = CertificateUtils.getCertificate(pemWithPrologString);
-		} catch (Throwable t) {
-			fail(t);			
-		}		
-		assertPartyACert(cert);		
+		String pemWithEpilogString = pemString + "some-stuff-to-ignore\n";
+
+		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(PATRTYA_MIME64_STRING)));
+		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(longB64String)));
+		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(pemString)));
+		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(pemWithPrologString)));
+		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(pemWithEpilogString)));
 	}
-	
+
 	@Test
-	void testGetSubjectCN() {		
+	void testGetPEMEncoded() {
+		X509Certificate cert = assertDoesNotThrow(() -> CertificateUtils.getCertificate(PATRTYA_MIME64_STRING));
+
+		String pem = assertDoesNotThrow(() -> CertificateUtils.getPEMEncoded(cert));
+
+		assertEquals("-----BEGIN CERTIFICATE-----\n" + PATRTYA_MIME64_STRING + "-----END CERTIFICATE-----", pem);
+	}
+
+	@Test
+	void testGetSubjectCN() {
 		X509Certificate cert = null;
 		try {
 			cert = CertificateUtils.getCertificate(TestUtils.getTestResource("partya.cert"));
@@ -174,7 +160,7 @@ class CertificateUtilsTest {
 	}
 
 	@Test
-	void testGetSubjectSN() {		
+	void testGetSubjectSN() {
 		X509Certificate cert = null;
 		try {
 			cert = CertificateUtils.getCertificate(TestUtils.getTestResource("device.cert"));
@@ -183,22 +169,20 @@ class CertificateUtilsTest {
 		}
 		assertEquals("000102637-T", CertificateUtils.getSubjectSN(cert));
 	}
-	
+
 	/**
 	 * Helper method to assert that the given certificate is the test certificate issued to <i>partya</i>.
-	 *  
-	 * @param cert 	certificate to test 
+	 *
+	 * @param cert 	certificate to test
 	 */
 	private void assertPartyACert(X509Certificate cert) {
 		assertNotNull(cert);
-		String dn = cert.getSubjectDN().getName();	
+		String dn = cert.getSubjectDN().getName();
 		assertAll("DN check", () -> assertTrue(dn.contains("CN=partya.examples.holodeck-b2b.com")),
 				() -> assertTrue(dn.contains("OU=Holodeck B2B Support")),
 				() -> assertTrue(dn.contains("O=Chasquis")),
-				() -> assertTrue(dn.contains("C=NL")));		
+				() -> assertTrue(dn.contains("C=NL")));
 		assertEquals(0x1005, cert.getSerialNumber().intValue());
 
 	}
-
-	
 }

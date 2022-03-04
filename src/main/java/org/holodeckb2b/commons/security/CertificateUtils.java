@@ -1,16 +1,16 @@
 /*******************************************************************************
  * Copyright (C) 2020 The Holodeck Team, Sander Fieten
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -38,17 +37,21 @@ import org.holodeckb2b.commons.util.Utils;
  */
 public class CertificateUtils {
 	/**
-	 * The start boundary of a PEM formatted certificate 
+	 * The start boundary of a PEM formatted certificate
 	 */
     private static final String PEM_START_BOUNDARY = "-----BEGIN CERTIFICATE-----";
-    
+	/**
+	 * The end boundary of a PEM formatted certificate
+	 */
+    private static final String PEM_END_BOUNDARY = "-----END CERTIFICATE-----";
+
 	/**
      * Certificate factory to create the X509 Certificate object
      */
     private static CertificateFactory certificateFactory;
 
     /**
-     * Gets the X509 Certificate from the base64 encoded DER byte array which may be PEM encapsulated.   
+     * Gets the X509 Certificate from the base64 encoded DER byte array which may be PEM encapsulated.
      *
      * @param b64EncodedCertificate The string containing the base64 encoded bytes
      * @return  The decoded Certificate instance, <code>null</code> if the given string is <code>null</code> or empty
@@ -58,32 +61,33 @@ public class CertificateUtils {
     public static X509Certificate getCertificate(final String b64EncodedCertificate) throws CertificateException {
     	if (Utils.isNullOrEmpty(b64EncodedCertificate))
     		return null;
-    	// Strip everything up to first and after the last possible PEM boundaries 
-    	final String encodedBytes = b64EncodedCertificate.contains(PEM_START_BOUNDARY) ?
-    			b64EncodedCertificate.substring(b64EncodedCertificate.indexOf('\n', 
-    																b64EncodedCertificate.indexOf(PEM_START_BOUNDARY))    											  
-    											, b64EncodedCertificate.length() - 25)
-    									: b64EncodedCertificate;
-    	
+    	// Strip everything up to first and after the last possible PEM boundaries
+		final int startBIdx = b64EncodedCertificate.indexOf(PEM_START_BOUNDARY);
+		final int endBIdx = b64EncodedCertificate.indexOf(PEM_END_BOUNDARY);
+    	final String encodedBytes = startBIdx >= 0 ?
+										b64EncodedCertificate.substring(b64EncodedCertificate.indexOf('\n', startBIdx)
+															, endBIdx > 0 ? endBIdx : b64EncodedCertificate.length())
+    								: b64EncodedCertificate;
+
     	byte[] certBytes = null;
     	try {
     		certBytes = Base64.decode(encodedBytes);
     	} catch (Exception decodingFailure) {
-    		throw new CertificateException("String is not a valid base64 encoding", decodingFailure);    		
+    		throw new CertificateException("String is not a valid base64 encoding", decodingFailure);
     	}
-    	
+
         return getCertificate(certBytes);
     }
 
     /**
-     * Gets the DER encoded X509 Certificate from the specified file. The format of the file can be both the plain 
-     * binary DER or PEM (base64 encoded) format. 
+     * Gets X509 Certificate from the specified file. The format of the file can be both the plain  binary DER or PEM
+	 * (base64 encoded) format.
      *
-     * @param b64EncodedCertificate Path to the file containing the certificate, must not be <code>null</code>
+     * @param certificateFile  Path to the file containing the certificate, must not be <code>null</code>
      * @return  The decoded Certificate instance
-     * @throws CertificateException When an error occurs reading the certificate from the file. For example when the 
+     * @throws CertificateException When an error occurs reading the certificate from the file. For example when the
      * 								file can not be read or does not contain a valid certificate.
-     */    
+     */
     public static X509Certificate getCertificate(final Path certificateFile) throws CertificateException {
     	if (certificateFile == null)
     		throw new IllegalArgumentException("A path must be specified");
@@ -93,11 +97,11 @@ public class CertificateUtils {
     		throw new CertificateException("Error accessing certificate file");
     	}
     }
-    
+
     /**
      * Converts the given byte array into a X509 Certificate.
      *
-     * @param certBytes The byte array containing the encoded certificate
+     * @param certBytes The byte array containing the DER encoded certificate
      * @return  The Certificate instance
      * @throws CertificateException When there is a problem in loading required classes for certificate processing
      */
@@ -107,40 +111,80 @@ public class CertificateUtils {
         else
         	return (X509Certificate) getCertificateFactory().generateCertificate(new ByteArrayInputStream(certBytes));
     }
-    
+
+	/**
+	 * Converts the certificate object into a PEM encoded string.
+	 *
+	 * @param cert	the certificate object
+	 * @return		the PEM encoded version of the certificate
+	 * @throws CertificateException When there is a problem in encoding the certificate
+	 * @since 1.1.0
+	 */
+	public static String getPEMEncoded(X509Certificate cert) throws CertificateException {
+		if (cert == null)
+			return null;
+
+		StringBuilder pemEncoded = new StringBuilder(PEM_START_BOUNDARY).append('\n');
+		pemEncoded.append(java.util.Base64.getMimeEncoder(64, "\n".getBytes()).encodeToString(cert.getEncoded()));
+		pemEncoded.append('\n').append(PEM_END_BOUNDARY);
+		return pemEncoded.toString();
+	}
+
     /**
      * Gets the CN field of the provided X509 certificate's Subject DN.
-     * 
+     *
      * @param cert	The X509 certificate
      * @return	The CN field of the Subject's DN or <code>null</code> if the CN could not be read
      */
     public static String getSubjectCN(final X509Certificate cert) {
     	try {
-			X500Name x500name = new X500Name(cert.getSubjectX500Principal().getName());
+			X500Name x500name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
 			RDN cn = x500name.getRDNs(BCStyle.CN)[0];
 			return IETFUtils.valueToString(cn.getFirst().getValue());
 		} catch (Exception invalidCert) {
 			return null;
-		}    
+		}
     }
 
     /**
-     * Gets the Serial Number field of the provided X509 certificate's Subject DN. 
-     * <p>NOTE: This is a different serial number then the serial number of the certificate itself! 
-     * 
+     * Gets the Subject's [distinguished] name of the provided X509 certificate
+     *
+     * @param cert	The X509 certificate
+     * @return	The Subject's DN
+	 * @since 1.1.0
+     */
+    public static String getSubjectName(final X509Certificate cert) {
+		return X500Name.getInstance(HB2BStyle.INSTANCE, cert.getSubjectX500Principal().getEncoded()).toString();
+    }
+
+	/**
+     * Gets the Issuer's [distinguished] name of the provided X509 certificate
+     *
+     * @param cert	The X509 certificate
+     * @return	The Issuer's DN
+	 * @since 1.1.0
+     */
+    public static String getIssuerName(final X509Certificate cert) {
+		return X500Name.getInstance(HB2BStyle.INSTANCE, cert.getIssuerX500Principal().getEncoded()).toString();
+    }
+
+    /**
+     * Gets the Serial Number field of the provided X509 certificate's Subject DN.
+     * <p>NOTE: This is a different serial number then the serial number of the certificate itself!
+     *
      * @param cert	The X509 certificate
      * @return	The Subject's Serial Number field or <code>null</code> if the SN could not be read
      */
     public static String getSubjectSN(final X509Certificate cert)  {
     	try {
-    		X500Name x500name = new X500Name(cert.getSubjectX500Principal().getName());
+    		X500Name x500name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
     		RDN cn = x500name.getRDNs(BCStyle.SN)[0];
     		return IETFUtils.valueToString(cn.getFirst().getValue());
     	} catch (Exception invalidCert) {
     		return null;
-    	}    	
+    	}
     }
-    
+
     /**
      * Gets the {@link CertificateFactory} instance to use for creating the <code>X509Certificate</code> object from a
      * byte array.
