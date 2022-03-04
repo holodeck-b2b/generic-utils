@@ -34,16 +34,24 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.holodeckb2b.commons.util.spi_test.FirstAvailableProvider;
 import org.holodeckb2b.commons.util.spi_test.IProviderInterface;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -300,6 +308,53 @@ public class UtilsTest {
 		
 		assertNotNull(provider);
 		assertTrue(provider instanceof FirstAvailableProvider);
+	}
+	
+	@Test
+	void testRequireNotNullString() {		
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((String) null));
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty(""));
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty("Hello World"));		
+	}
+
+	@Test
+	void testRequireNotNullCollection() {		
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((Collection) null));
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty(new ArrayList<String>()));
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singleton("Hello World")));		
+	}
+	
+	@Test
+	void testRequireNotNullMap() {		
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((Map) null));
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty(new HashMap<String, String>()));
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singletonMap("Hello", "World")));		
+	}
+	
+	@Test
+	void testRequireNotNullIterator() {		
+		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((Iterator) null));
+		assertThrows(IllegalArgumentException.class, 
+											() -> Utils.requireNotNullOrEmpty(new ArrayList<String>().iterator()));
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singleton("Hello World").iterator()));		
+	}
+	
+	@Test
+	void testAreEqualList() {
+		assertTrue(Utils.areEqual((List<String>) null, (List<String>) null));
+		assertTrue(Utils.areEqual(new ArrayList<String>(), new ArrayList<String>()));
+		assertTrue(Utils.areEqual((List<String>) null, new ArrayList<String>()));
+		assertTrue(Utils.areEqual(new ArrayList<String>(), (List<String>) null));
+		assertTrue(Utils.areEqual(Arrays.asList("a", "b", "c"), Arrays.asList("a", "b", "c")));
+
+		assertFalse(Utils.areEqual((List<String>) null, Arrays.asList("a", "b", "c")));
+		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c"), (List<String>) null));
+		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c"), new ArrayList<String>()));
+		assertFalse(Utils.areEqual(new ArrayList<String>(), Arrays.asList("a", "b", "c")));
+		assertFalse(Utils.areEqual(Arrays.asList("a", "c", "b"), Arrays.asList("a", "b", "c")));
+		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c"), Arrays.asList("a", "c", "b")));
+		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c", "d"), Arrays.asList("a", "b", "c")));
+		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c"), Arrays.asList("a", "b", "c", "d")));
 	}
 	
 	class CloseableByteArrayOutputStream extends ByteArrayOutputStream {

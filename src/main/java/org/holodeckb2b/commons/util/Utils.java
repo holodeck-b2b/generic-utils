@@ -1,16 +1,16 @@
 /*******************************************************************************
  * Copyright (C) 2020 The Holodeck Team, Sander Fieten
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
@@ -23,6 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -31,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +47,7 @@ import java.util.TimeZone;
  */
 public final class Utils {
 
-	private static final String XML_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";	
+	private static final String XML_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
 
 	/**
      * Transform a {@link Date} into a {@link String} formatted according to the specification of the <code>dateTime
@@ -58,7 +60,7 @@ public final class Utils {
      */
     public static String toXMLDateTime(final Date date) {
         if (date == null)
-            return null;        
+            return null;
 		SimpleDateFormat xmlDateFormatter = new SimpleDateFormat(XML_DATETIME_FORMAT);
 		xmlDateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return xmlDateFormatter.format(date);
@@ -76,33 +78,33 @@ public final class Utils {
     public static String toXMLDateTime(final LocalDateTime timestamp) {
     	if (timestamp == null)
     		return null;
-    	DateTimeFormatter xmlDateFormatter = DateTimeFormatter.ofPattern(XML_DATETIME_FORMAT);    	
+    	DateTimeFormatter xmlDateFormatter = DateTimeFormatter.ofPattern(XML_DATETIME_FORMAT);
     	return timestamp.atZone(ZoneOffset.UTC).format(xmlDateFormatter);
     }
 
     /**
      * Parses a {@link String} for XML dateTime (see <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">section 3.2.7
-     * of the XML Specification</a>) and when a valid date is found return a {@link ZonedDateTime} object representing 
+     * of the XML Specification</a>) and when a valid date is found return a {@link ZonedDateTime} object representing
      * the same time stamp. NOTE: When the given XML date time does not include a time zone the returned date time will
-     * be in the system's default time zone. 
+     * be in the system's default time zone.
      *
      * @param   xmlDateTimeString   string that should contain the <code>xs:dateTime</code> formatted date
      * @return  A {@link Date} object for the parsed date or,</br>
      * 			<code>null</code> when the input is empty or <code>null</code>
      * @throws  ParseException on date time parsing error
-     */    
+     */
     public static ZonedDateTime parseDateTimeFromXML(final String xmlDateTimeString) throws ParseException {
     	final String[] formatAndC14NValue = getFormatAndC14N(xmlDateTimeString);
     	if (formatAndC14NValue == null)
     		return null;
     	else if (formatAndC14NValue[0].endsWith("Z"))
     		return ZonedDateTime.parse(formatAndC14NValue[1], DateTimeFormatter.ofPattern(formatAndC14NValue[0]));
-    	else 
-    		return ZonedDateTime.of(LocalDateTime.parse(formatAndC14NValue[1], 
-    													DateTimeFormatter.ofPattern(formatAndC14NValue[0])), 
+    	else
+    		return ZonedDateTime.of(LocalDateTime.parse(formatAndC14NValue[1],
+    													DateTimeFormatter.ofPattern(formatAndC14NValue[0])),
     								ZoneId.systemDefault());
     }
-    
+
     /**
      * Parses a {@link String} for XML dateTime (see <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">section 3.2.7
      * of the XML Specification</a>) and when a valid date is found return a {@link Date} object representing the same
@@ -114,23 +116,23 @@ public final class Utils {
      * @throws  ParseException on date time parsing error
      */
     public static Date fromXMLDateTime(final String xmlDateTimeString) throws ParseException {
-    	final String[] formatAndC14NValue = getFormatAndC14N(xmlDateTimeString);    	
+    	final String[] formatAndC14NValue = getFormatAndC14N(xmlDateTimeString);
     	return formatAndC14NValue != null ? new SimpleDateFormat(formatAndC14NValue[0]).parse(formatAndC14NValue[1])
     									  : null;
     }
-    
+
     /**
      * Helper method to determine the format of given XML date time string and how it should be parsed. The string is
-     * reformatted so it can be correctly parsed. 
-     * 
-     * @param xmlDateTimeString	string containing the XML date time 
+     * reformatted so it can be correctly parsed.
+     *
+     * @param xmlDateTimeString	string containing the XML date time
      * @return	a String array with two elements; first the pattern to parse the date time and second the reformated
-     * 			XML date time 
+     * 			XML date time
      */
     private static String[] getFormatAndC14N(final String xmlDateTimeString) {
     	if (Utils.isNullOrEmpty(xmlDateTimeString))
     		return null;
-    	
+
     	String s = xmlDateTimeString;
         String f = null;
 
@@ -172,15 +174,15 @@ public final class Utils {
             }
         }
 
-        return new String[] { f , s }; 
+        return new String[] { f , s };
     }
 
     /**
-     * Gets the key of the entry in a one-to-one Map that has the given value. Note that this function simply searches 
+     * Gets the key of the entry in a one-to-one Map that has the given value. Note that this function simply searches
      * for the first entry in the map that has the given value and does not check if other entries exists with the same
-     * value. As this function uses the {@link V#equals(Object)} to compare the map entry values with the given value, 
-     * its result depends on the correct implementation of this method.  
-     * 
+     * value. As this function uses the {@link V#equals(Object)} to compare the map entry values with the given value,
+     * its result depends on the correct implementation of this method.
+     *
      * @param map   map to search
      * @param value value to search the corresponding key value for, must not be <code>null</code>
      * @param K		type of the key value
@@ -196,7 +198,7 @@ public final class Utils {
     }
 
     /**
-     * Compares two strings for equality returning a code that differentiates in the reason of inequality or equality. 
+     * Compares two strings for equality returning a code that differentiates in the reason of inequality or equality.
      *
      * @param s     First input string
      * @param p     Second input string
@@ -222,7 +224,7 @@ public final class Utils {
         } else {
             return 1;
         }
-    }    
+    }
 
     /**
      * Checks whether the given String is non-empty and returns its value if true, otherwise the supplied default will
@@ -258,8 +260,8 @@ public final class Utils {
             // The given text does not contain a comma-separated list of integers
             return null;
         }
-    }     
-    
+    }
+
     /**
      * Checks whether the given String is <code>null</code> or is an empty string, i.e. does not contain any other
      * characters then whitespace.
@@ -374,7 +376,7 @@ public final class Utils {
      */
     public static String getExceptionTrace(final Throwable t, final boolean indent) {
         final StringBuffer r = new StringBuffer();
-        
+
         if (indent)
         	r.append('\t');
         r.append(t.getClass().getSimpleName());
