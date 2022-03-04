@@ -457,51 +457,51 @@ public final class Utils {
         boolean isValid;
         try {
             final URI parsedURI = new URI(uri);
-            isValid = !Utils.isNullOrEmpty(parsedURI.getScheme());            
+            isValid = !Utils.isNullOrEmpty(parsedURI.getScheme());
         } catch (URISyntaxException ex) {
             isValid = false;
         }
         return isValid;
     }
-    
+
     /**
-     * Tests if the given String represents the boolean "true" value. 
-     * 
+     * Tests if the given String represents the boolean "true" value.
+     *
      * return <code>true</code> if the String is equal to, ignoring case, "true", "T", "1", 'yes' or "Y"<br>
      * 		  <code>false</code> otherwise
      */
     public static boolean isTrue(String value) {
-        return value != null && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("t") || value.equals("1") 
+        return value != null && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("t") || value.equals("1")
         						|| value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("y"));
-    }    
-    
+    }
+
     /**
-     * Copies the content of an input stream to an output stream and returns the numbers of bytes copied. 
-     * <p>Note that this method will copy all content <b>remaining</b> on the source stream and <b>append</b> it to the 
-     * what is already written to the destination stream. Neither the input nor the output stream will be close by this 
-     * method. 
-     *   
+     * Copies the content of an input stream to an output stream and returns the numbers of bytes copied.
+     * <p>Note that this method will copy all content <b>remaining</b> on the source stream and <b>append</b> it to the
+     * what is already written to the destination stream. Neither the input nor the output stream will be close by this
+     * method.
+     *
      * @param src	source stream
      * @param dst	destination stream
      * @return	the number of bytes copied from the source to the destination stream
-     * @throws IOException	when an error occurs reading from the source or writing to the destination stream 
+     * @throws IOException	when an error occurs reading from the source or writing to the destination stream
      */
     public static long copyStream(InputStream src, OutputStream dst) throws IOException {
     	long copied = 0;
     	int b;
     	while ((b = src.read()) >= 0) {
-    		dst.write(b); 
+    		dst.write(b);
     		copied++;
     	}
     	dst.flush();
-    	
+
     	return copied;
     }
-    
+
     /**
      * Gets the first available provider that implements the given interface. This method uses the Java Service Provider
-     * Interface to get the list of providers and returns the first one that can be successfully instantiated. 
-     * 
+     * Interface to get the list of providers and returns the first one that can be successfully instantiated.
+     *
      * @param <T>	the interface that specifies the provider to be loaded
      * @param providerClass	the provider interface class
      * @return an instance of the first provider that is available, <code>null</code> if no provider is available
@@ -509,13 +509,131 @@ public final class Utils {
     public static <T> T getFirstAvailableProvider(Class<T> providerClass) {
     	T	provider = null;
     	Iterator<T> providers = ServiceLoader.load(providerClass).iterator();
-    	
+
     	while (provider == null && providers.hasNext()) {
             try {
                 provider = providers.next();
-            } catch (Throwable t) {                                
+            } catch (Throwable t) {
             }
-        }    	
+        }
     	return provider;
     }
+
+   /**
+     * Checks that the given String is not <code>null</code> or an empty string, i.e. does not contain any other
+     * characters then whitespace and throws an {@link IllegalArgumentException} if it is.
+     *
+     * @param s     The string to check
+	 * @throws IllegalArgumentException when the given string is <code>null</code> or empty
+	 * @since 1.1.0
+     */
+    public static void requireNotNullOrEmpty(final String s) {
+        if (isNullOrEmpty(s))
+			throw new IllegalArgumentException();
+    }
+
+    /**
+     * Checks that the given Collection is not <code>null</code> or empty and throws an {@link IllegalArgumentException}
+	 * if it is.
+     *
+     * @param c     The Collection to check
+	 * @throws IllegalArgumentException when the given collection is <code>null</code> or empty
+	 * @since 1.1.0
+     */
+    public static void requireNotNullOrEmpty(final Collection<?> c) {
+        if (isNullOrEmpty(c))
+			throw new IllegalArgumentException();
+    }
+
+    /**
+     * Checks that the given Map is not <code>null</code> or empty and throws an {@link IllegalArgumentException} if it
+	 * is.
+     *
+     * @param m     The Map to check
+	 * @throws IllegalArgumentException when the given map is <code>null</code> or empty
+	 * @since 1.1.0
+     */
+    public static void requireNotNullOrEmpty(final Map<?,?> m) {
+        if (isNullOrEmpty(m))
+			throw new IllegalArgumentException();
+    }
+
+    /**
+     * Checks that the given Iterator is not <code>null</code> or does not contain any more objects and throws an
+	 * {@link IllegalArgumentException} if it is.
+     *
+     * @param i     The Iterator to check
+	 * @throws IllegalArgumentException when the given iterator is <code>null</code> or empty
+	 * @since 1.1.0
+     */
+    public static void requireNotNullOrEmpty(final Iterator<?> i) {
+        if (isNullOrEmpty(i))
+			throw new IllegalArgumentException();
+    }
+
+	/**
+	 * Checks if two lists are both empty or contain the same elements, in the same order.
+	 *
+	 * @param l1	the first list
+	 * @param l2	the second list
+	 * @return	<code>true</code> iff <code>l1</code> and <code>l2</code> are both <code>null</code> or empty lists or
+	 *			contain the same elements in the same order.
+	 *			<code>false</code> otherwise
+	 * @since 1.1.0
+	 */
+	public static boolean areEqual(List<?> l1, List<?> l2) {
+		if (l1 == l2)
+			return true;
+		if (Utils.isNullOrEmpty(l1) & Utils.isNullOrEmpty(l2))
+			return true;
+		if (l1 == null || l2 == null)
+			return false;
+		if (l1.size() != l2.size())
+			return false;
+
+		for(int i = 0; i < l1.size(); i++) {
+			Object o1 =  l1.get(i), o2 = l2.get(i);
+			if (o1 != o2 && (o1 == null || !o1.equals(o2) || o2 == null || !o2.equals(o1)))
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Checks if two collections are both empty or contain the same elements.
+	 *
+	 * @param c1	the first collection
+	 * @param c2	the second collection
+	 * @return	<code>true</code> iff <code>c1</code> and <code>c2</code> are both <code>null</code> or empty or
+	 *			contain the same elements with the same cardinality
+	 *			<code>false</code> otherwise
+	 * @since 1.1.0
+	 */
+	public static boolean areEqual(Collection<?> c1, Collection<?> c2) {
+		if (c1 == c2)
+			return true;
+		if (Utils.isNullOrEmpty(c1) & Utils.isNullOrEmpty(c2))
+			return true;
+		if (c1 == null || c2 == null)
+			return false;
+		if (c1.size() != c2.size())
+			return false;
+
+		Map<Object, Integer> card1 = getCardinalities(c1);
+		Map<Object, Integer> card2 = getCardinalities(c2);
+		for(Object o1 : c1)
+			if (card1.get(o1) != card2.get(o1))
+				return false;
+		return true;
+	}
+
+	private static Map<Object, Integer> getCardinalities(Collection<?> c) {
+		HashMap<Object, Integer> card = new HashMap<>(c.size());
+		for (Object o : c) {
+			Integer cc = card.get(o);
+			cc = cc != null ? cc + 1 : 1;
+			card.put(o, cc);
+		}
+		return card;
+	}
 }
