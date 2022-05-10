@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   and write the key pair from/to a PKCS12 input/output stream 
 * Added methods `setResponseEntityBody()` and `getResponseHeaders()` to `HttpBackendMock` to set the http response 
   entity respectively the response http headers.
+* Added method `clearRequests()` to `HttpBackendMock` to clear request data 
 
 ### Fixed
 * Incorrect handling of PEM end boundary

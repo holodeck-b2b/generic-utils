@@ -97,6 +97,13 @@ public class HttpBackendMock {
     	this.attempts = 0;
     }
 
+    public void clearRequests() {
+    	this.attempts = 0;
+    	this.requestURL = null;
+    	this.requestHeaders = null;
+    	this.requestEntityBody = null;    			
+    }
+    
     public void stop() {
         server.stop(0);
     }
