@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.1.1
+##### 2022-07-11
+### Changed
+* Project available on Maven Central
+* Updated README with Maven coordinates
+* Dependency on Tika to version 2.4.1
+* Dependency on BouncyCastle to version 1.71
+
+### Fixed
+* Errors in Javadocs
+* Problem in repeatly running test class `FileUtilsTest`
+* NPE in `Utils.nullSafeEqual(ZonedDateTime, ZonedDateTime)`
+
 ## 1.1.0
 ##### 2022-05-10
 ### Added

@@ -1,6 +1,13 @@
 # Holodeck B2B Generic Utilities
 This project contains a collection of classes that provide generic utilities commonly used in other [Holodeck B2B](https://github.com/holodeck-b2b/) projects.
 
+## Using
+This project is available on Maven Central using the following coordinates:
+```xml
+	<groupId>org.holodeckb2b.commons</groupId>
+	<artifactId>generic-utils</artifactId>
+	<version>1.1.1</version>
+```
 
 ## Contributing
 We are using the simplified Github workflow to accept modifications which means you should:
