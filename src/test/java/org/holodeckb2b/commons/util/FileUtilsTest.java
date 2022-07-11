@@ -29,6 +29,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.HashSet;
@@ -146,7 +147,7 @@ public class FileUtilsTest {
 		try {
 			Files.walkFileTree(dirContent, 	new SimpleFileVisitor<Path>() {
 				public FileVisitResult preVisitDirectory(Path p, BasicFileAttributes attr) throws IOException {
-					Files.copy(p, dirToClean.resolve(dirContent.relativize(p)));
+					Files.copy(p, dirToClean.resolve(dirContent.relativize(p)), StandardCopyOption.REPLACE_EXISTING);
 					return FileVisitResult.CONTINUE;
 				}
 				

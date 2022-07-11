@@ -135,7 +135,7 @@ public class MessageIdUtils {
      *
      * @param messageId     The message id to check for valid characters
      * @return              <code>true</code> if the given messageId does contain only valid characters,<br>
-     *                      <code>false></code> otherwise
+     *                      <code>false</code> otherwise
      */
     public static boolean isAllowed(final String messageId) {
         if (Utils.isNullOrEmpty(messageId))
@@ -150,7 +150,7 @@ public class MessageIdUtils {
      *
      * @param messageId     The message id to check for correct syntax
      * @return              <code>true</code> if the given messageId is in correct format,<br>
-     *                      <code>false></code> otherwise
+     *                      <code>false</code> otherwise
      */
     public static boolean isCorrectFormat(final String messageId) {
         if (Utils.isNullOrEmpty(messageId))

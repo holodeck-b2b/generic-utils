@@ -55,7 +55,7 @@ public class Pair<A, B> {
 	 * Compares this pair for equality with the given object. A Pair is equal if the other Pair object contains the 
 	 * same values, i.e. the contained objects are equal.
 	 * 
-	 * @return <code>true</code> when the other object is also a <code>Pair</code> and contains the same values,</br>
+	 * @return <code>true</code> when the other object is also a <code>Pair</code> and contains the same values,<br>
 	 * 		   <code>false</code> otherwise
 	 */
 	public boolean equals(Object o) {

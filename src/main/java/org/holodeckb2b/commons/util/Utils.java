@@ -71,7 +71,7 @@ public final class Utils {
      * dateTime</code> datatype of XML schema and using the UTC time zone.<br>
      * See <a href="http://www.w3.org/TR/xmlschema-2/#dateTime">section 3.2.7 of the XML Specification</a> for details.
      *
-     * @param   date object to be converted to an XML formatted date string.
+     * @param   timestamp	object to be converted to an XML formatted date string.
      * @return  The date as an <code>xs:dateTime</code> formatted String
      *          or <code>null</code> when date object was <code>null</code>
      */
@@ -89,7 +89,7 @@ public final class Utils {
      * be in the system's default time zone.
      *
      * @param   xmlDateTimeString   string that should contain the <code>xs:dateTime</code> formatted date
-     * @return  A {@link Date} object for the parsed date or,</br>
+     * @return  A {@link Date} object for the parsed date or,<br>
      * 			<code>null</code> when the input is empty or <code>null</code>
      * @throws  ParseException on date time parsing error
      */
@@ -111,7 +111,7 @@ public final class Utils {
      * time stamp in the default time zone.
      *
      * @param   xmlDateTimeString   string that should contain the <code>xs:dateTime</code> formatted date
-     * @return  A {@link Date} object for the parsed date or,</br>
+     * @return  A {@link Date} object for the parsed date or,<br>
      * 			<code>null</code> when the input is empty or <code>null</code>
      * @throws  ParseException on date time parsing error
      */
@@ -185,8 +185,8 @@ public final class Utils {
      *
      * @param map   map to search
      * @param value value to search the corresponding key value for, must not be <code>null</code>
-     * @param K		type of the key value
-     * @param V		type of the value stored in the map
+     * @param <K>	type of the key value
+     * @param <V>	type of the value stored in the map
      * @return The key corresponding to the provided value or <code>null</code> if no entry with this value is found
      */
     public static <K, V> K getKeyByValue(final Map<K, V> map, final String value) {
@@ -403,11 +403,9 @@ public final class Utils {
      * non-<code>null</code> than the {@link #equals(Object)} method is invoked on
      * them.
      *
-     * @param o1
-     *        First object. May be <code>null</code>.
-     * @param o2
-     *        Second object. May be <code>null</code>.
-     * @param <T>
+     * @param o1	First object. May be <code>null</code>.
+     * @param o2 	Second object. May be <code>null</code>.
+     * @param <T> the class of the objects to compare
      * @return <code>true</code> if both are <code>null</code> or if both are
      *         equal.
      */
@@ -422,14 +420,14 @@ public final class Utils {
      * non-<code>null</code> than they are converted to {@link Instant}s on the time line
      * and compared for equality. 
      *
-     * @param s1	First date time. May be <code>null</code>.
-     * @param s2	Second date time. May be <code>null</code>.
+     * @param t1	First date time. May be <code>null</code>.
+     * @param t2	Second date time. May be <code>null</code>.
      * @return <code>true</code> if both are <code>null</code> or if both represent
      *         the same instant on the time line
      * @since 1.1.0
      */    
     public static boolean nullSafeEqual(final ZonedDateTime t1, final ZonedDateTime t2) {
-    	return t1 == null ? t2 == null : t1.toInstant().equals(t2.toInstant());
+    	return t1 == null ? t2 == null : t2 != null && t1.toInstant().equals(t2.toInstant());
     }
     
     /**
@@ -469,8 +467,9 @@ public final class Utils {
     /**
      * Tests if the given String represents the boolean "true" value.
      *
-     * return <code>true</code> if the String is equal to, ignoring case, "true", "T", "1", 'yes' or "Y"<br>
-     * 		  <code>false</code> otherwise
+     * @param  value 	the string value to check
+     * @return	 <code>true</code> if the String is equal to, ignoring case, "true", "T", "1", 'yes' or "Y"<br>
+     * 		 	 <code>false</code> otherwise
      */
     public static boolean isTrue(String value) {
         return value != null && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("t") || value.equals("1")

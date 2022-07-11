@@ -141,7 +141,7 @@ public final class FileUtils {
 	 * <b>NOTE: </b>This method will create a new file. If the caller decides it doesn't need it anymore it is
 	 * responsible for deleting it.
 	 *
-	 * @param baseName path of the file to be created. 
+	 * @param basePath path of the file to be created. 
 	 * @return path to the new file.
 	 * @throws IOException When the file could not be created, for example because a parent directory does not exist 
 	 * 						(anymore) or the parent directory is not writable.

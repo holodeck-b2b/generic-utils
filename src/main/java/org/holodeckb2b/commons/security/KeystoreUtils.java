@@ -163,6 +163,8 @@ public final class KeystoreUtils {
 	 *
 	 * @param path Path to the keystore
 	 * @param pwd  Password to access the keystore
+	 * @return  <code>true</code> iff the file specified by the given path exists and can be loaded as a key store,
+	 * 			<code>false</code> otherwise
 	 */
 	public static boolean check(final Path path, final String pwd) {
 		if (!Files.isRegularFile(path) || !Files.isReadable(path))
@@ -182,6 +184,8 @@ public final class KeystoreUtils {
 	 * @param path Path to the keystore
 	 * @param pwd  Password to access the keystore
 	 * @param type The expected type of the keustore, either JKS or PKCS#12
+	 * @return <code>true</code> iff the file specified by the given path exists and can be loaded as a key store of the
+	 * 		 	specified type, <code>false</code> otherwise
 	 */
 	public static boolean check(final Path path, final String pwd, final KeystoreType type) {
 		if (!Files.isRegularFile(path) || !Files.isReadable(path))
@@ -304,7 +308,7 @@ public final class KeystoreUtils {
      * @param keystore  The keystore to save
      * @param path      The path to the keystore file
      * @param pwd       Password to access the keystore file
-     * @throws SecurityProcessingException When the keystore could not be saved to the specified location.
+     * @throws KeyStoreException When the keystore could not be saved to the specified location.
      */
     public static void save(final KeyStore keystore, final Path path, final String pwd)
                                                                                     throws KeyStoreException {
