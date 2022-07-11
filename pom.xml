@@ -69,19 +69,20 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
-
+	
 	<dependencies>
-		<!-- Apache Tika is used to determine MIME Type -->
+		<!-- Apache Tika is only used in the FileUtils class to detect the MIME Type of a file. If you don't need
+		the mime type or file name extension detection this dependency can be safely excluded.-->
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
-			<version>1.25</version>
-        </dependency>
+			<version>2.4.1</version>			
+		</dependency>
         <!--  BouncyCastle is used for certificate processing -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.69</version>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.71</version>
         </dependency>
 		<!-- Dependencies specific for testing -->
 		<dependency>
