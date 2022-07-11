@@ -13,13 +13,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.holodeckb2b.commons</groupId>
 	<artifactId>generic-utils</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>jar</packaging>
 	<name>Holodeck B2B - Generic Utilities</name>
 	<description>This project contains a collection of classes that provide generic utilities commonly used in
 	other Holodeck B2B projects</description>
 	<inceptionYear>2020</inceptionYear>
-
 	<url>https://github.com/holodeck-b2b/generic-utils</url>
 	<scm>
 		<url>https://github.com/holodeck-b2b/generic-utils</url>
