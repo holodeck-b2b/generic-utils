@@ -19,10 +19,17 @@ package org.holodeckb2b.commons.security;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
+import javax.security.auth.x500.X500Principal;
+
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -185,6 +192,56 @@ public class CertificateUtils {
     	}
     }
 
+    /**
+     * Determines if the given X509 certificate has the the specified SKI
+     * 
+     * @param cert		certificate to check
+     * @param skiBytes	the expected SKI 
+     * @return			<code>true</code> if the given certificate has the same SKI, <code>false</code> otherwise
+     * @since 1.2.0
+     */
+    public static boolean hasSKI(final X509Certificate cert, byte[] skiBytes) {
+    	byte[] skiExtValue = cert.getExtensionValue("2.5.29.14");
+		if (skiExtValue != null) {
+			byte[] ski = Arrays.copyOfRange(skiExtValue, 4, skiExtValue.length);    			
+			return Arrays.equals(ski, skiBytes);
+		} else
+			return false;
+    }
+    
+    /**
+     * Determines if the given X509 certificate has the specified serial number and is issued by specified issuer.
+     * 
+     * @param cert		certificate to check
+     * @param issuer	the expected issuer of the certificate
+     * @param serial	the expected serial number
+     * @return	<code>true</code> if the given certificate has the same serial number and issuer, 
+     * 			<code>false</code> otherwise
+     * @since 1.2.0
+     */
+    public static boolean hasIssuerSerial(final X509Certificate cert, final X500Principal issuer, 
+    										final BigInteger serial) {
+    	return cert.getIssuerX500Principal().equals(issuer) && cert.getSerialNumber().equals(serial);
+    }
+    
+    /**
+     * Determines if the given X509 certificate has the specified hash value calculated by the given diget method
+     * 
+     * @param cert			certificate to check
+     * @param hash 		the expected hash value
+     * @param digester	the digest method to calculate the hash
+     * @return	<code>true</code> if the given certificate has the same hash value,	<code>false</code> otherwise
+     * @since 1.2.0
+     */
+    public static boolean hasThumbprint(final X509Certificate cert, final byte[] hash, final MessageDigest digester) { 
+        try {
+        	digester.reset();
+        	return Arrays.equals(digester.digest(cert.getEncoded()), hash);    	
+        } catch (CertificateEncodingException ex) {            
+            return false;
+        }
+    }    
+    
     /**
      * Gets the {@link CertificateFactory} instance to use for creating the <code>X509Certificate</code> object from a
      * byte array.

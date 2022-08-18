@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.2.0
+##### Not yet released
+### Added
+* Method `CertificateUtils.hasSKI()` to determine if a certificate has the specified _Subject Key Identifier_
+* Method `CertificateUtils.hasIssuerSerial()` to determine if a certificate is issued by the specified issuer and has 
+  the specified serial number
+* Method `CertificateUtils.hasThumbprint()` to determine if a certificate has the specified thumbprint
+
 ## 1.1.1
 ##### 2022-07-11
 ### Changed

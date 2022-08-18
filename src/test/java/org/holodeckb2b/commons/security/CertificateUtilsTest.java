@@ -1,20 +1,28 @@
 package org.holodeckb2b.commons.security;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.nio.file.Path;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import org.holodeckb2b.commons.testing.TestUtils;
-import org.holodeckb2b.commons.util.Utils;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
+import javax.security.auth.x500.X500Principal;
+
+import org.holodeckb2b.commons.testing.TestUtils;
+import org.holodeckb2b.commons.util.Utils;
 import org.junit.jupiter.api.Test;
 
 class CertificateUtilsTest {
@@ -170,6 +178,50 @@ class CertificateUtilsTest {
 		assertEquals("000102637-T", CertificateUtils.getSubjectSN(cert));
 	}
 
+	@Test
+	void testHasSKI() {
+		X509Certificate cert = 
+				assertDoesNotThrow(() -> CertificateUtils.getCertificate(TestUtils.getTestResource("device.cert")));
+
+		byte[] skiExtValue = cert.getExtensionValue("2.5.29.14");
+		byte[] ski = Arrays.copyOfRange(skiExtValue, 4, skiExtValue.length);
+		
+		assertTrue(CertificateUtils.hasSKI(cert, ski));
+		
+		byte[] randomSki = Long.toHexString(Double.doubleToLongBits(Math.random())).getBytes();
+		assertFalse(CertificateUtils.hasSKI(cert, randomSki));
+	}
+	
+	@Test
+	void testHasIssuerSerial() {
+		X509Certificate cert = 
+				assertDoesNotThrow(() -> CertificateUtils.getCertificate(TestUtils.getTestResource("device.cert")));
+		
+		X500Principal issuer = cert.getIssuerX500Principal();
+		BigInteger serial = cert.getSerialNumber();
+		
+		assertTrue(CertificateUtils.hasIssuerSerial(cert, issuer, serial));		
+		assertFalse(CertificateUtils.hasIssuerSerial(cert, issuer, serial.add(serial)));
+		assertFalse(CertificateUtils.hasIssuerSerial(cert, 
+								new X500Principal("CN=Tester, OU=Testing, O=HolodeckB2B, C=NL"), serial.add(serial)));		
+	}
+	
+	@Test
+	void testHasThumbprint() {
+		X509Certificate cert = 
+				assertDoesNotThrow(() -> CertificateUtils.getCertificate(TestUtils.getTestResource("partya.cert")));
+		
+		MessageDigest sha1 = assertDoesNotThrow(() -> MessageDigest.getInstance("SHA1"));
+		MessageDigest sha2 = assertDoesNotThrow(() -> MessageDigest.getInstance("SHA-256"));
+		
+		byte[] sha1Hash = assertDoesNotThrow(() -> sha1.digest(cert.getEncoded()));
+		byte[] sha2Hash = assertDoesNotThrow(() -> sha2.digest(cert.getEncoded()));
+		
+		assertTrue(CertificateUtils.hasThumbprint(cert, sha2Hash, sha2));
+		assertFalse(CertificateUtils.hasThumbprint(cert, sha1Hash, sha2));
+		assertFalse(CertificateUtils.hasThumbprint(cert, sha2Hash, sha1));
+	}
+	
 	/**
 	 * Helper method to assert that the given certificate is the test certificate issued to <i>partya</i>.
 	 *
