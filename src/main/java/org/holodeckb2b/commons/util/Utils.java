@@ -180,7 +180,7 @@ public final class Utils {
     /**
      * Gets the key of the entry in a one-to-one Map that has the given value. Note that this function simply searches
      * for the first entry in the map that has the given value and does not check if other entries exists with the same
-     * value. As this function uses the {@link V#equals(Object)} to compare the map entry values with the given value,
+     * value. As this function uses the {@link #equals(Object)} to compare the map entry values with the given value,
      * its result depends on the correct implementation of this method.
      *
      * @param map   map to search
