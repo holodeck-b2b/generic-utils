@@ -19,6 +19,7 @@ package org.holodeckb2b.commons.security;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -34,6 +35,7 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.holodeckb2b.commons.util.Utils;
 
@@ -87,7 +89,7 @@ public class CertificateUtils {
     }
 
     /**
-     * Gets X509 Certificate from the specified file. The format of the file can be both the plain  binary DER or PEM
+     * Gets X509 Certificate from the specified file. The format of the file can be both the plain binary DER or PEM
 	 * (base64 encoded) format.
      *
      * @param certificateFile  Path to the file containing the certificate, must not be <code>null</code>
@@ -99,7 +101,7 @@ public class CertificateUtils {
     	if (certificateFile == null)
     		throw new IllegalArgumentException("A path must be specified");
     	try(FileInputStream fis = new FileInputStream(certificateFile.toFile())) {
-    		return (X509Certificate) getCertificateFactory().generateCertificate(fis);
+    		return getCertificate(fis);
     	} catch (IOException e) {
     		throw new CertificateException("Error accessing certificate file");
     	}
@@ -116,9 +118,26 @@ public class CertificateUtils {
         if (certBytes == null || certBytes.length == 0)
             return null;
         else
-        	return (X509Certificate) getCertificateFactory().generateCertificate(new ByteArrayInputStream(certBytes));
+        	return getCertificate(new ByteArrayInputStream(certBytes));
     }
 
+    /**
+     * Gets X509 Certificate from the given input stream. The format of the certificate can be both the plain binary DER 
+     * or PEM (base64 encoded) format. After reading the certificate, the stream is left open at the position where the
+     * certificate ended.
+     *
+     * @param is  input stream containing the certificate, must not be <code>null</code>
+     * @return  The decoded Certificate instance
+     * @throws CertificateException When an error occurs reading the certificate from the stream.
+     * @since 1.2.0 
+     */
+    public static X509Certificate getCertificate(final InputStream is) throws CertificateException {
+    	if (is == null)
+    		throw new IllegalArgumentException("A stream must be specified");
+    	return (X509Certificate) getCertificateFactory().generateCertificate(is);
+    }
+    
+    
 	/**
 	 * Converts the certificate object into a PEM encoded string.
 	 *
@@ -164,6 +183,23 @@ public class CertificateUtils {
 		return X500Name.getInstance(HB2BStyle.INSTANCE, cert.getSubjectX500Principal().getEncoded()).toString();
     }
 
+    /**
+     * Gets the CN field of the provided X509 certificate's Issuer DN.
+     *
+     * @param cert	The X509 certificate
+     * @return	The CN field of the Issuer's DN or <code>null</code> if the CN could not be read
+     * @since 1.2.0
+     */
+    public static String getIssuerCN(final X509Certificate cert) {
+    	try {
+			X500Name x500name = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+			RDN cn = x500name.getRDNs(BCStyle.CN)[0];
+			return IETFUtils.valueToString(cn.getFirst().getValue());
+		} catch (Exception invalidCert) {
+			return null;
+		}
+    }
+    
 	/**
      * Gets the Issuer's [distinguished] name of the provided X509 certificate
      *
@@ -201,7 +237,7 @@ public class CertificateUtils {
      * @since 1.2.0
      */
     public static boolean hasSKI(final X509Certificate cert, byte[] skiBytes) {
-    	byte[] skiExtValue = cert.getExtensionValue("2.5.29.14");
+    	byte[] skiExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
 		if (skiExtValue != null) {
 			byte[] ski = Arrays.copyOfRange(skiExtValue, 4, skiExtValue.length);    			
 			return Arrays.equals(ski, skiBytes);

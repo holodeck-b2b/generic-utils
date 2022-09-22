@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Method `CertificateUtils.hasIssuerSerial()` to determine if a certificate is issued by the specified issuer and has 
   the specified serial number
 * Method `CertificateUtils.hasThumbprint()` to determine if a certificate has the specified thumbprint
+* Method `CertificateUtils.getIssuerCN(X509Certificate)` to get the CN of the certificate's issuer
 
 ## 1.1.1
 ##### 2022-07-11
