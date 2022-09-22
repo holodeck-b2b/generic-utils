@@ -261,6 +261,24 @@ public final class Utils {
             return null;
         }
     }
+    
+    /**
+     * Converts an integer array to a String containing the integers from the array as a comma-separated list.  
+     *  
+     * @param aInt	integer array to convert
+     * @return		String containing the integers as a comma-separated list. When the given array is <code>null</code>
+     * 				or empty, an empty String is returned
+     * @since 1.2.0
+     */
+    public static String toCSLString(final int[] aInt) {
+    	StringBuffer txt = new StringBuffer();
+    	if (aInt != null && aInt.length > 0) {
+			txt.append(aInt[0]);
+			for(int i = 1; i < aInt.length; i++)
+				txt.append(',').append(aInt[i]);
+    	}
+		return txt.toString();
+    }
 
     /**
      * Checks whether the given String is <code>null</code> or is an empty string, i.e. does not contain any other

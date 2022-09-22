@@ -2,14 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## 1.2.0
-##### Not yet released
+## 1.2.0-SNAPSHOT-1
+##### 
 ### Added
 * Method `CertificateUtils.hasSKI()` to determine if a certificate has the specified _Subject Key Identifier_
 * Method `CertificateUtils.hasIssuerSerial()` to determine if a certificate is issued by the specified issuer and has 
   the specified serial number
 * Method `CertificateUtils.hasThumbprint()` to determine if a certificate has the specified thumbprint
 * Method `CertificateUtils.getIssuerCN(X509Certificate)` to get the CN of the certificate's issuer
+* Method `Utils.toCSLString(int [])` to convert an integer to a comma-separated list String representation 
 
 ## 1.1.1
 ##### 2022-07-11
