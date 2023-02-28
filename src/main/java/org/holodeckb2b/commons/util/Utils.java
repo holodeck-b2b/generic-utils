@@ -261,10 +261,10 @@ public final class Utils {
             return null;
         }
     }
-    
+
     /**
-     * Converts an integer array to a String containing the integers from the array as a comma-separated list.  
-     *  
+     * Converts an integer array to a String containing the integers from the array as a comma-separated list.
+     *
      * @param aInt	integer array to convert
      * @return		String containing the integers as a comma-separated list. When the given array is <code>null</code>
      * 				or empty, an empty String is returned
@@ -436,18 +436,18 @@ public final class Utils {
      * objects are <code>null</code> they are interpreted as being equal. If only
      * one object is <code>null</code> they are different. If both objects are
      * non-<code>null</code> than they are converted to {@link Instant}s on the time line
-     * and compared for equality. 
+     * and compared for equality.
      *
      * @param t1	First date time. May be <code>null</code>.
      * @param t2	Second date time. May be <code>null</code>.
      * @return <code>true</code> if both are <code>null</code> or if both represent
      *         the same instant on the time line
      * @since 1.1.0
-     */    
+     */
     public static boolean nullSafeEqual(final ZonedDateTime t1, final ZonedDateTime t2) {
     	return t1 == null ? t2 == null : t2 != null && t1.toInstant().equals(t2.toInstant());
     }
-    
+
     /**
      * Compare any 2 {@link String}s in a <code>null</code> safe manner. If both passed
      * objects are <code>null</code> they are interpreted as being equal. If only
@@ -493,6 +493,17 @@ public final class Utils {
         return value != null && (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("t") || value.equals("1")
         						|| value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("y"));
     }
+
+	/**
+	 * Checks if the given Boolean is not null and is set to true.
+	 *
+	 * @param value	the Boolean to check
+	 * @return	<code>true</code> when the given Boolean is not null and is true, <code>false</code> otherwise
+	 * @since 1.2.0
+	 */
+	public static boolean isTrue(Boolean value) {
+		return value != null ? value : false;
+	}
 
     /**
      * Copies the content of an input stream to an output stream and returns the numbers of bytes copied.

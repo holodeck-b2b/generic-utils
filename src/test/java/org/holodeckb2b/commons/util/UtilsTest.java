@@ -1,29 +1,20 @@
 /*******************************************************************************
  * Copyright (C) 2020 The Holodeck Team, Sander Fieten
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 package org.holodeckb2b.commons.util;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,10 +39,17 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.holodeckb2b.commons.util.spi_test.FirstAvailableProvider;
 import org.holodeckb2b.commons.util.spi_test.IProviderInterface;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -153,7 +151,7 @@ public class UtilsTest {
 		} catch (ParseException e) {
 			fail();
 		}
-		
+
 		try {
 			assertNull(Utils.parseDateTimeFromXML(""));
 		} catch (ParseException e) {
@@ -164,9 +162,9 @@ public class UtilsTest {
 		} catch (ParseException e) {
 			fail();
 		}
-		
+
 	}
-	
+
 	@Test
 	void testParseDateTimeFromXML() {
 		ZonedDateTime ts = null;
@@ -192,7 +190,7 @@ public class UtilsTest {
 		}
 		assertEquals(ZoneOffset.UTC.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()),
 				ts.getZone().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()));
-		
+
 		assertEquals(2020, ts.get(ChronoField.YEAR));
 		assertEquals(5, ts.get(ChronoField.MONTH_OF_YEAR));
 		assertEquals(4, ts.get(ChronoField.DAY_OF_MONTH));
@@ -200,21 +198,21 @@ public class UtilsTest {
 		assertEquals(13, ts.get(ChronoField.MINUTE_OF_HOUR));
 		assertEquals(51, ts.get(ChronoField.SECOND_OF_MINUTE));
 		assertEquals(0, ts.get(ChronoField.MILLI_OF_SECOND));
-		
+
 		try {
 			ts = Utils.parseDateTimeFromXML("2020-05-04T17:13:51.0-02:00");
 		} catch (ParseException e) {
 			fail(e);
 		}
 		assertEquals(ZoneOffset.ofHours(-2).getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()),
-					ts.getZone().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()));		
+					ts.getZone().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.getDefault()));
 		assertEquals(2020, ts.get(ChronoField.YEAR));
 		assertEquals(5, ts.get(ChronoField.MONTH_OF_YEAR));
 		assertEquals(4, ts.get(ChronoField.DAY_OF_MONTH));
 		assertEquals(17, ts.get(ChronoField.HOUR_OF_DAY));
 		assertEquals(13, ts.get(ChronoField.MINUTE_OF_HOUR));
 		assertEquals(51, ts.get(ChronoField.SECOND_OF_MINUTE));
-		assertEquals(0, ts.get(ChronoField.MILLI_OF_SECOND));		
+		assertEquals(0, ts.get(ChronoField.MILLI_OF_SECOND));
 	}
 
 	/**
@@ -246,24 +244,36 @@ public class UtilsTest {
 		assertEquals("default", Utils.getValueOrDefault("", "default"));
 		assertEquals("data", Utils.getValueOrDefault("data", "default"));
 	}
-	
+
 	@ParameterizedTest
 	@ValueSource(strings = { "T", "true", "True", "tRuE", "y", "Y", "1", "yes" , "yEs" })
-	void testIsTrueCorrect(String v) {
+	void testIsTrueStringCorrect(String v) {
 		assertTrue(Utils.isTrue(v));
 	}
 
 	@ParameterizedTest
 	@ValueSource(strings = { "F", "false", "False", "tREu", "0", "11", "eys", "TT" })
-	void testIsTrueInCorrect(String v) {
+	void testIsTrueStringInCorrect(String v) {
 		assertFalse(Utils.isTrue(v));
 	}
-	
+
+	@Test
+	void testIsTrueBooleanTrue() {
+		assertTrue(Utils.isTrue(Boolean.TRUE));
+	}
+
+	@Test
+	void testIsTrueBooleanFalse() {
+		assertFalse(Utils.isTrue(Boolean.FALSE));
+		assertFalse(Utils.isTrue((Boolean) null));
+	}
+
+
 	@Test
 	void testParseIntArray() {
 		assertNull(Utils.parseIntArray(null));
 		assertNull(Utils.parseIntArray(""));
-		
+
 		assertArrayEquals(new int[] { 1 }, Utils.parseIntArray("1"));
 		assertArrayEquals(new int[] { 1, 2, 3, 4 }, Utils.parseIntArray(" 1 ,2,3 ,4 "));
 		assertArrayEquals(new int[] { 1, 2, -3, 4 }, Utils.parseIntArray(" 1 ,2,-3 ,4 "));
@@ -272,73 +282,73 @@ public class UtilsTest {
 		assertNull(Utils.parseIntArray("1, A, 2"));
 		assertNull(Utils.parseIntArray("1, 2,A"));
 	}
-	
+
 	@Test
 	void testCopyStream() throws IOException {
 		byte[] source = "This string will be used as the source stream for testing the copy stream method".getBytes();
-		
+
 		ByteArrayInputStream bis = new ByteArrayInputStream(source);
 		CloseableByteArrayOutputStream bos = new CloseableByteArrayOutputStream();
-		
+
 		long copyCount = 0;
 		try {
 			copyCount = Utils.copyStream(bis, bos);
 		} catch (Throwable t) {
-			fail(t);		
+			fail(t);
 		}
-		
-		assertEquals(0, bis.available());		
+
+		assertEquals(0, bis.available());
 		assertEquals(source.length, copyCount);
 		assertArrayEquals(source, bos.toByteArray());
 		assertFalse(bos.isClosed);
-		
+
 		assertDoesNotThrow(() -> bis.close());
 		assertDoesNotThrow(() -> bos.close());
 	}
-	
+
 	@Test
 	void testGetFirstAvailableProvider() {
-		
-		IProviderInterface provider = null;		
+
+		IProviderInterface provider = null;
 		try {
-			provider = Utils.getFirstAvailableProvider(IProviderInterface.class); 
+			provider = Utils.getFirstAvailableProvider(IProviderInterface.class);
 		} catch (Throwable t) {
 			fail(t);
 		}
-		
+
 		assertNotNull(provider);
 		assertTrue(provider instanceof FirstAvailableProvider);
 	}
-	
+
 	@Test
-	void testRequireNotNullString() {		
+	void testRequireNotNullString() {
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((String) null));
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty(""));
-		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty("Hello World"));		
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty("Hello World"));
 	}
 
 	@Test
-	void testRequireNotNullCollection() {		
+	void testRequireNotNullCollection() {
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((Collection) null));
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty(new ArrayList<String>()));
-		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singleton("Hello World")));		
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singleton("Hello World")));
 	}
-	
+
 	@Test
-	void testRequireNotNullMap() {		
+	void testRequireNotNullMap() {
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((Map) null));
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty(new HashMap<String, String>()));
-		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singletonMap("Hello", "World")));		
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singletonMap("Hello", "World")));
 	}
-	
+
 	@Test
-	void testRequireNotNullIterator() {		
+	void testRequireNotNullIterator() {
 		assertThrows(IllegalArgumentException.class, () -> Utils.requireNotNullOrEmpty((Iterator) null));
-		assertThrows(IllegalArgumentException.class, 
+		assertThrows(IllegalArgumentException.class,
 											() -> Utils.requireNotNullOrEmpty(new ArrayList<String>().iterator()));
-		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singleton("Hello World").iterator()));		
+		assertDoesNotThrow(() -> Utils.requireNotNullOrEmpty(Collections.singleton("Hello World").iterator()));
 	}
-	
+
 	@Test
 	void testAreEqualList() {
 		assertTrue(Utils.areEqual((List<String>) null, (List<String>) null));
@@ -356,10 +366,10 @@ public class UtilsTest {
 		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c", "d"), Arrays.asList("a", "b", "c")));
 		assertFalse(Utils.areEqual(Arrays.asList("a", "b", "c"), Arrays.asList("a", "b", "c", "d")));
 	}
-	
+
 	class CloseableByteArrayOutputStream extends ByteArrayOutputStream {
 		boolean isClosed = false;
-		
+
 		@Override
 		public void close() throws IOException {
 			super.close();
