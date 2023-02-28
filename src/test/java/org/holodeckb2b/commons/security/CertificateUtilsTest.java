@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.math.BigInteger;
@@ -18,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -27,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 class CertificateUtilsTest {
 
-	private static final String PATRTYA_MIME64_STRING
+	private static final String PARTYA_MIME64_STRING
 				= "MIIFvjCCA6agAwIBAgICEAUwDQYJKoZIhvcNAQELBQAwZjELMAkGA1UEBhMCTkwx\n"
 				+ "ETAPBgNVBAoMCENoYXNxdWlzMR0wGwYDVQQLDBRIb2xvZGVjayBCMkIgU3VwcG9y\n"
 				+ "dDElMCMGA1UEAwwcY2EuZXhhbXBsZXMuaG9sb2RlY2stYjJiLm9yZzAeFw0yMDA3\n"
@@ -78,13 +80,7 @@ class CertificateUtilsTest {
 			fail(t);
 		}
 
-		String dn = cert.getSubjectDN().getName();
-		assertAll("DN check", () -> assertTrue(dn.contains("CN=partya.examples.holodeck-b2b.com")),
-						      () -> assertTrue(dn.contains("OU=Holodeck B2B Support")),
-						      () -> assertTrue(dn.contains("O=Chasquis")),
-						      () -> assertTrue(dn.contains("C=NL")));
-		assertEquals(0x1005, cert.getSerialNumber().intValue());
-
+		assertPartyACert(cert);
 	}
 
 	@Test
@@ -132,15 +128,15 @@ class CertificateUtilsTest {
 	@Test
 	void testGetCertFromString() {
 		StringBuilder buf = new StringBuilder();
-		for (String line : PATRTYA_MIME64_STRING.split("\n"))
+		for (String line : PARTYA_MIME64_STRING.split("\n"))
 			buf.append(line);
 		String longB64String = buf.toString();
 
-		String pemString = "-----BEGIN CERTIFICATE-----\n" + PATRTYA_MIME64_STRING + "-----END CERTIFICATE-----";
+		String pemString = "-----BEGIN CERTIFICATE-----\n" + PARTYA_MIME64_STRING + "-----END CERTIFICATE-----";
 		String pemWithPrologString = "some-prop-to-ignore: partya\n" + pemString;
 		String pemWithEpilogString = pemString + "some-stuff-to-ignore\n";
 
-		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(PATRTYA_MIME64_STRING)));
+		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(PARTYA_MIME64_STRING)));
 		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(longB64String)));
 		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(pemString)));
 		assertPartyACert(assertDoesNotThrow(() -> CertificateUtils.getCertificate(pemWithPrologString)));
@@ -148,12 +144,33 @@ class CertificateUtilsTest {
 	}
 
 	@Test
+	void testGetCertificates() {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try (FileInputStream fis = new FileInputStream(TestUtils.getTestResource("device.cert").toFile())) {
+			baos.write("-----BEGIN CERTIFICATE-----\n".getBytes());
+			baos.write(PARTYA_MIME64_STRING.getBytes());
+			baos.write("-----END CERTIFICATE-----\n".getBytes());
+			Utils.copyStream(fis, baos);
+		} catch (Exception e) {
+			fail(e);
+		}
+
+		List<X509Certificate> chain = assertDoesNotThrow(() ->
+									CertificateUtils.getCertificates(new ByteArrayInputStream(baos.toByteArray())));
+
+		assertEquals(2, chain.size());
+		assertPartyACert(chain.get(0));
+		assertEquals(assertDoesNotThrow(() ->
+					 CertificateUtils.getCertificate(TestUtils.getTestResource("device.cert"))), chain.get(1));
+	}
+
+	@Test
 	void testGetPEMEncoded() {
-		X509Certificate cert = assertDoesNotThrow(() -> CertificateUtils.getCertificate(PATRTYA_MIME64_STRING));
+		X509Certificate cert = assertDoesNotThrow(() -> CertificateUtils.getCertificate(PARTYA_MIME64_STRING));
 
 		String pem = assertDoesNotThrow(() -> CertificateUtils.getPEMEncoded(cert));
 
-		assertEquals("-----BEGIN CERTIFICATE-----\n" + PATRTYA_MIME64_STRING + "-----END CERTIFICATE-----", pem);
+		assertEquals("-----BEGIN CERTIFICATE-----\n" + PARTYA_MIME64_STRING + "-----END CERTIFICATE-----", pem);
 	}
 
 	@Test
@@ -180,48 +197,48 @@ class CertificateUtilsTest {
 
 	@Test
 	void testHasSKI() {
-		X509Certificate cert = 
+		X509Certificate cert =
 				assertDoesNotThrow(() -> CertificateUtils.getCertificate(TestUtils.getTestResource("device.cert")));
 
 		byte[] skiExtValue = cert.getExtensionValue("2.5.29.14");
 		byte[] ski = Arrays.copyOfRange(skiExtValue, 4, skiExtValue.length);
-		
+
 		assertTrue(CertificateUtils.hasSKI(cert, ski));
-		
+
 		byte[] randomSki = Long.toHexString(Double.doubleToLongBits(Math.random())).getBytes();
 		assertFalse(CertificateUtils.hasSKI(cert, randomSki));
 	}
-	
+
 	@Test
 	void testHasIssuerSerial() {
-		X509Certificate cert = 
+		X509Certificate cert =
 				assertDoesNotThrow(() -> CertificateUtils.getCertificate(TestUtils.getTestResource("device.cert")));
-		
+
 		X500Principal issuer = cert.getIssuerX500Principal();
 		BigInteger serial = cert.getSerialNumber();
-		
-		assertTrue(CertificateUtils.hasIssuerSerial(cert, issuer, serial));		
+
+		assertTrue(CertificateUtils.hasIssuerSerial(cert, issuer, serial));
 		assertFalse(CertificateUtils.hasIssuerSerial(cert, issuer, serial.add(serial)));
-		assertFalse(CertificateUtils.hasIssuerSerial(cert, 
-								new X500Principal("CN=Tester, OU=Testing, O=HolodeckB2B, C=NL"), serial.add(serial)));		
+		assertFalse(CertificateUtils.hasIssuerSerial(cert,
+								new X500Principal("CN=Tester, OU=Testing, O=HolodeckB2B, C=NL"), serial.add(serial)));
 	}
-	
+
 	@Test
 	void testHasThumbprint() {
-		X509Certificate cert = 
+		X509Certificate cert =
 				assertDoesNotThrow(() -> CertificateUtils.getCertificate(TestUtils.getTestResource("partya.cert")));
-		
+
 		MessageDigest sha1 = assertDoesNotThrow(() -> MessageDigest.getInstance("SHA1"));
 		MessageDigest sha2 = assertDoesNotThrow(() -> MessageDigest.getInstance("SHA-256"));
-		
+
 		byte[] sha1Hash = assertDoesNotThrow(() -> sha1.digest(cert.getEncoded()));
 		byte[] sha2Hash = assertDoesNotThrow(() -> sha2.digest(cert.getEncoded()));
-		
+
 		assertTrue(CertificateUtils.hasThumbprint(cert, sha2Hash, sha2));
 		assertFalse(CertificateUtils.hasThumbprint(cert, sha1Hash, sha2));
 		assertFalse(CertificateUtils.hasThumbprint(cert, sha2Hash, sha1));
 	}
-	
+
 	/**
 	 * Helper method to assert that the given certificate is the test certificate issued to <i>partya</i>.
 	 *
