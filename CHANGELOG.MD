@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.2.1
+##### 2023-03-21
+### Fixed
+* Incorrect equality check of issuer in `CertificateUtils.hasIssuerSerial()`
+
 ## 1.2.0
 ##### 2023-02-28
 ### Added
