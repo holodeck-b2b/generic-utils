@@ -279,7 +279,11 @@ public class CertificateUtils {
      */
     public static boolean hasIssuerSerial(final X509Certificate cert, final X500Principal issuer,
     										final BigInteger serial) {
-    	return cert.getIssuerX500Principal().equals(issuer) && cert.getSerialNumber().equals(serial);
+    	
+        // We convert the issuer names to a BouncyCastle X509Name, which will set the attributes of the DN in a 
+    	// particular way (see WSS-168) which we can then compare.        
+        return new X500Name(cert.getIssuerX500Principal().getName()).equals(new X500Name(issuer.getName()))
+        		&& cert.getSerialNumber().equals(serial);
     }
 
     /**

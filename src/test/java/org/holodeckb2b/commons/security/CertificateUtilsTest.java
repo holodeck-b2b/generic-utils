@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.holodeckb2b.commons.testing.TestUtils;
 import org.holodeckb2b.commons.util.Utils;
 import org.junit.jupiter.api.Test;
@@ -218,6 +220,9 @@ class CertificateUtilsTest {
 		BigInteger serial = cert.getSerialNumber();
 
 		assertTrue(CertificateUtils.hasIssuerSerial(cert, issuer, serial));
+		String rIssuer = X500Name.getInstance(BCStyle.INSTANCE, cert.getIssuerX500Principal().getEncoded()).toString();
+		assertTrue(CertificateUtils.hasIssuerSerial(cert, new X500Principal(rIssuer), serial));
+		
 		assertFalse(CertificateUtils.hasIssuerSerial(cert, issuer, serial.add(serial)));
 		assertFalse(CertificateUtils.hasIssuerSerial(cert,
 								new X500Principal("CN=Tester, OU=Testing, O=HolodeckB2B, C=NL"), serial.add(serial)));
