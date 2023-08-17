@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.3.0
+##### 2023-08-17
+### Added
+* Method `CertificateUtils.getSKI()` to retrieve the Subject Key Identifier of a X509 certificate
+
 ## 1.2.1
 ##### 2023-03-21
 ### Fixed

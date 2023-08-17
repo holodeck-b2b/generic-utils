@@ -249,6 +249,19 @@ public class CertificateUtils {
     		return null;
     	}
     }
+    
+	/**
+     * Gets the Subject Key Identifier contained in the provided X509 certificate
+     *
+     * @param cert	The X509 certificate
+     * @return	The Subject Key Identifier as byte array, or <code>null</code> if the certificate does not contain the
+     * 			SKI extension
+	 * @since 1.3.0
+     */    
+    public static byte[] getSKI(final X509Certificate cert) {
+    	byte[] skiExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
+		return skiExtValue != null ? Arrays.copyOfRange(skiExtValue, 4, skiExtValue.length) : null;
+    }
 
     /**
      * Determines if the given X509 certificate has the the specified SKI
@@ -259,12 +272,8 @@ public class CertificateUtils {
      * @since 1.2.0
      */
     public static boolean hasSKI(final X509Certificate cert, byte[] skiBytes) {
-    	byte[] skiExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
-		if (skiExtValue != null) {
-			byte[] ski = Arrays.copyOfRange(skiExtValue, 4, skiExtValue.length);
-			return Arrays.equals(ski, skiBytes);
-		} else
-			return false;
+    	byte[] certSKI = getSKI(cert);
+    	return certSKI != null && Arrays.equals(certSKI, skiBytes);
     }
 
     /**
