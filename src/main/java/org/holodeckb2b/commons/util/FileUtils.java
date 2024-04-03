@@ -92,6 +92,22 @@ public final class FileUtils {
 	}
 
 	/**
+	 * Determines the mime type of the data contained in the given input stream. It can not be guaranteed that this
+	 * method will return the correct mime type. Therefore it is RECOMMENDED that the producer of the data supplies the
+	 * [correct] mime type together with it.
+	 * <p>
+	 * Current implementation is based on <i>Apache Tika</i> which scans file contents to detect mime type.
+	 *
+	 * @param is The input stream to determine the mime type for
+	 * @return The detected mime type for the given stream
+	 * @throws IOException When the given stream can not be accessed for mime type detection
+	 * @since 1.4.0
+	 */
+	public static String detectMimeType(final InputStream is) throws IOException {
+		return FileUtils.SingletonHolder.mimeTypeDetector.detect(is).toString();
+	}
+
+	/**
 	 * Determines extension to use for the given mime type.
 	 * <p>
 	 * Current implementation is based on <i>Apache Tika</i>. If the given mime type is not recognized no extension will
