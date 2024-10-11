@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -185,13 +186,7 @@ public class CertificateUtils {
      * @return	The CN field of the Subject's DN or <code>null</code> if the CN could not be read
      */
     public static String getSubjectCN(final X509Certificate cert) {
-    	try {
-			X500Name x500name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-			RDN cn = x500name.getRDNs(BCStyle.CN)[0];
-			return IETFUtils.valueToString(cn.getFirst().getValue());
-		} catch (Exception invalidCert) {
-			return null;
-		}
+    	return getSubjectDNField(cert, BCStyle.CN);
     }
 
     /**
@@ -241,9 +236,21 @@ public class CertificateUtils {
      * @return	The Subject's Serial Number field or <code>null</code> if the SN could not be read
      */
     public static String getSubjectSN(final X509Certificate cert)  {
+    	return getSubjectDNField(cert, BCStyle.SERIALNUMBER);
+    }
+        
+    /**
+     * Gets the specified field of the provided X509 certificate's Subject DN.
+     *
+     * @param cert	The X509 certificate
+     * @param field ASN1 OID of the field to retrieve. It is recommend to use a constant from the {@link BCStyle} class.
+     * @return	The Subject's Organisation field or <code>null</code> if the SN could not be read
+     * @since 1.4.0
+     */
+    public static String getSubjectDNField(final X509Certificate cert, final ASN1ObjectIdentifier field)  {
     	try {
     		X500Name x500name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-    		RDN cn = x500name.getRDNs(BCStyle.SN)[0];
+    		RDN cn = x500name.getRDNs(field)[0];
     		return IETFUtils.valueToString(cn.getFirst().getValue());
     	} catch (Exception invalidCert) {
     		return null;

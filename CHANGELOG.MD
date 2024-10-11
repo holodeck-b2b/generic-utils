@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.5.0
+##### 2024-10-11
+### Added
+* Method `CertificateUtils.getSubjectDNField(X509Certificate, ASN1ObjectIdentifier)` to get a specific field from the
+  Certificate's Subject'DN
+
 ## 1.4.0
 ##### 2024-04-03
 ### Added
