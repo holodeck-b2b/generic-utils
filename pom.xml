@@ -13,7 +13,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.holodeckb2b.commons</groupId>
 	<artifactId>generic-utils</artifactId>
-	<version>1.4.0</version>
+	<version>1.5.0</version>
 	<packaging>jar</packaging>
 	<name>Holodeck B2B - Generic Utilities</name>
 	<description>This project contains a collection of classes that provide generic utilities commonly used in
