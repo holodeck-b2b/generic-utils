@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.6.0
+##### 
+### Added
+* Optional parameter to `Utils.copyStream()` to set the buffer size to use for copying of the stream
+
 ## 1.5.0
 ##### 2024-10-11
 ### Added

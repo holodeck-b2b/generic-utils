@@ -517,11 +517,30 @@ public final class Utils {
      * @throws IOException	when an error occurs reading from the source or writing to the destination stream
      */
     public static long copyStream(InputStream src, OutputStream dst) throws IOException {
+    	return copyStream(src, dst, 64);
+    }
+
+    /**
+     * Copies the content of an input stream to an output stream using a buffer of the specified size and returns the
+     * numbers of bytes copied.
+     * <p>Note that this method will copy all content <b>remaining</b> on the source stream and <b>append</b> it to the
+     * what is already written to the destination stream. Neither the input nor the output stream will be close by this
+     * method.
+     *
+     * @param src	source stream
+     * @param dst	destination stream
+     * @param bufferSize	size of the buffer
+     * @return	the number of bytes copied from the source to the destination stream
+     * @throws IOException	when an error occurs reading from the source or writing to the destination stream
+     * @since 1.6.0
+     */
+	public static long copyStream(InputStream src, OutputStream dst, int bufferSize) throws IOException {
     	long copied = 0;
-    	int b;
-    	while ((b = src.read()) >= 0) {
-    		dst.write(b);
-    		copied++;
+    	byte buffer[] = new byte[bufferSize];
+    	int r;
+    	while ((r = src.read(buffer)) > 0) {
+    		dst.write(buffer, 0, r);
+    		copied += r;
     	}
     	dst.flush();
 
