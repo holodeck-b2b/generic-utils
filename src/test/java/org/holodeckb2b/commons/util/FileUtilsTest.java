@@ -184,9 +184,9 @@ public class FileUtilsTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = { "$", "/", "\\", ",", "#", "@" })
+	@ValueSource(strings = { "$", "/", "\\", ",", "#", "@", ":" })
 	void testSanitizeFileNameReplace(String c) {
-		String fileName = "test" + c + "file.txt";
+		String fileName = "TeSt" + c + "file.TXT";
 		assertEquals("test_file.txt", FileUtils.sanitizeFileName(fileName));
 	}
 }
