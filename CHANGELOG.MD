@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 1.6.1
 #####
 ### Fixed
-* FileUtilsTest#testIsWriteableDir fails on Windows. [#1] (https://github.com/holodeck-b2b/generic-utils/issues/1)
+* FileUtilsTest#testIsWriteableDir fails on Windows. [#1](https://github.com/holodeck-b2b/generic-utils/issues/1)
 
 ## 1.6.0
 ##### 2025-04-10
