@@ -37,15 +37,19 @@ import java.util.Set;
 
 import org.holodeckb2b.commons.testing.TestUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class FileUtilsTest {
 
 	@Test
+	@DisabledOnOs(OS.WINDOWS)
 	void testIsWriteableDir() {
 		Path testDir = TestUtils.getTestResource("directory");
 		try {
+			Files.deleteIfExists(testDir);
 			Files.createDirectory(testDir);
 		} catch (IOException e) {
 			fail(e);
