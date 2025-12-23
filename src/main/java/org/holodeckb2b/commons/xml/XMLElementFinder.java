@@ -131,7 +131,7 @@ public class XMLElementFinder extends DefaultHandler {
 											        					elementToRead.getLocalPart().equals(name) :
 											        					elementToRead.equals(new QName(uri, name));
         	
-        // If parsing has not started after START_ELEMENTS_THRESHOLD, we abort parsing.
+        // If parsing has not started after the set maximum of elements to scan, we abort parsing.
         if (!parsingActive && maxElements > 0 && elementsSeen >= maxElements)
         	throw new StopSaxParserException();
 
