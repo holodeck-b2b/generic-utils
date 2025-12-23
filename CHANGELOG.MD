@@ -7,6 +7,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 * FileUtilsTest#testIsWriteableDir fails on Windows. [#1](https://github.com/holodeck-b2b/generic-utils/issues/1)
 
+### Changed
+* Minimum Java runtime version is now 11
+* Dependency on Apache Tika (used for file MIME type detection) to version 3.2.3
+
 ## 1.6.0
 ##### 2025-04-10
 ### Added
